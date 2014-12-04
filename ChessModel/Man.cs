@@ -3,24 +3,24 @@ using System.Collections.Generic;
 
 namespace ChessModel
 {
-    enum ManColor
+    public enum ManColor
     {
         Black, White
     }
-    enum ManType
+    public enum ManType
     {
         King, Queen, Rock, Knight, Bishop, Pawn
     }
 
-    public class Man
+    public abstract class Man
     {
         public ManColor Color {get; set;}
         public int X { get; set; }
         public int Y { get; set; }
 
-        public virtual string Name { get { return "Unknown"; } }
-        public virtual ManType ManType { get; }
-        public String ToString()
+        public abstract string Name { get; }
+        public abstract ManType ManType { get; }
+        override public String ToString()
         {
             return "" + Color + " " + Name;
         }
@@ -29,42 +29,42 @@ namespace ChessModel
     public class Pawn : Man
     {
         public Pawn(ManColor color) { Color = color; }
-        public virtual string Name { get { return "Pawn"; } }
-        public virtual ManType ManType { get { return ManType.Pawn; } }
+        public override string Name { get { return "Pawn"; } }
+        public override ManType ManType { get { return ManType.Pawn; } }
     }
 
     public class Rock : Man
     {
         public Rock(ManColor color) { Color = color; }
-        public virtual string Name { get { return "Rock"; } }
-        public virtual ManType ManType { get { return ManType.Rock; } }
+        public override string Name { get { return "Rock"; } }
+        public override ManType ManType { get { return ManType.Rock; } }
     }
 
     public class Knight : Man
     {
         public Knight(ManColor color) { Color = color; }
-        public virtual string Name { get { return "Knight"; } }
-        public virtual ManType ManType { get { return ManType.Knight; } }
+        public override string Name { get { return "Knight"; } }
+        public override ManType ManType { get { return ManType.Knight; } }
     }
 
     public class Bishop : Man
     {
         public Bishop(ManColor color) { Color = color; }
-        public virtual string Name { get { return "Bishop"; } }
-        public virtual ManType ManType { get { return ManType.Bishop; } }
+        public override string Name { get { return "Bishop"; } }
+        public override ManType ManType { get { return ManType.Bishop; } }
     }
 
     public class King : Man
     {
         public King(ManColor color) { Color = color; }
-        public virtual string Name { get { return "King"; } }
-        public virtual ManType ManType { get { return ManType.King; } }
+        public override string Name { get { return "King"; } }
+        public override ManType ManType { get { return ManType.King; } }
     }
 
     public class Queen : Man
     {
         public Queen(ManColor color) { Color = color; }
-        public virtual string Name { get { return "Queen"; } }
-        public virtual ManType ManType { get { return ManType.XXXXXX; } }
+        public override string Name { get { return "Queen"; } }
+        public override ManType ManType { get { return ManType.Queen; } }
     }
 }

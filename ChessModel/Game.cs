@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ChessModel
 {
-    class Game
+    public class Game
     {
         public Game()
         {
@@ -15,5 +15,7 @@ namespace ChessModel
 
         private Board board = new Board();
         public Board Board { get { return board; } }
+
+        public int Id { get; set; }
     }
 }

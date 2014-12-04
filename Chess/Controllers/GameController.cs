@@ -12,7 +12,7 @@ namespace Chess.Controllers
         // GET: /Game/
         public ActionResult Index(int id)
         {
-            return View();
+            return PartialView("board", id);
         }
 	}
 }

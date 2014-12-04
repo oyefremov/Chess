@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chess.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,7 +13,10 @@ namespace Chess.Controllers
         // GET: /Board/
         public ActionResult Index(int id)
         {
-            return View();
+            var game = GamesManager.Instance.GetGame(id);
+            if (game == null)
+                return Content("Game not available");
+            return View(game.Board);
         }
 	}
 }
