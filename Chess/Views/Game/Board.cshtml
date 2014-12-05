@@ -8,8 +8,7 @@
             <td>@((char)('A' + y))</td>
             @for (var x = 0; x < 8; x++)
             {
-                <td bgcolor="@(((x+y)&1)==1?"yellow":"brown")" >
-                    [**]
+                <td class="square @(((x+y)&1)==1?"white":"black")">
                 </td>
             }
         </tr>
@@ -18,7 +17,7 @@
         <td></td>
         @for (var x = 0; x < 8; x++)
         {
-            <td>@((char)('1' + x))</td>            
+            <td align="center">@((char)('1' + x))</td>
         }
     </tr>
 </table>

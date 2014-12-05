@@ -47,6 +47,25 @@ input[type="checkbox"].input-validation-error {
     display: none;
 }
 
+td.square {
+    width: 64px;
+    height: 64px;
+    text-align: center;
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+td.white {
+    background-color: yellow;
+}
+
+td.black {
+    background-color: brown;
+}
+
+.board-square-white {
+}
+
 @media only screen and (max-width: 767px) {
     .nofloat {
         float: none;
