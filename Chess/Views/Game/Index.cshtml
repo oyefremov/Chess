@@ -1,0 +1,9 @@
+﻿@model ChessModel.Game
+
+@{
+    ViewBag.Title = "Game " + Model.Id;
+}
+
+<h2>Game @Model.Id</h2>
+<br/>
+@Html.Partial("Board", Model.Board)

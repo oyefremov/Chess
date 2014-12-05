@@ -1,0 +1,20 @@
+﻿@model ChessModel.Board
+
+<table>    
+@for (var y = 0; y < 8; y++)
+{
+    <tr>
+        @for (var x = 0; x < 8; x++)
+        {
+        <td>
+            @var @man = @Model.Cell(x, y);
+            @if (man != null)
+            {
+                @man.toString()
+            }   
+        </td>
+        <p>Line @i</p>
+        }
+    </tr>
+}
+</table>

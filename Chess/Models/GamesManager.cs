@@ -9,7 +9,7 @@ namespace Chess.Models
     public class GamesManager
     {
         static GamesManager instance = new GamesManager();
-        public static GamesManager Instance { get { return Instance; } }
+        public static GamesManager Instance { get { return instance; } }
 
         IDictionary<int, Game> games = new Dictionary<int,Game>();
 

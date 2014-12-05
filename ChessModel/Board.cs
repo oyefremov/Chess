@@ -18,6 +18,11 @@ namespace ChessModel
         List<Man> blackMans = new List<Man>();
         BoardCell[,] cells = new BoardCell[8, 8];
 
+        Man Cell(int x, int y)
+        {
+            return cells[x, y].man;
+        }
+
         public void Clear()
         {
             whiteMans.Clear();
@@ -35,7 +40,7 @@ namespace ChessModel
                 for (int x = 0; x < 7; ++x)
                 {
                     result[(x + y * 8) * 2 + 0] = (char)('A' + x);
-                    result[(x + y * 8) * 2 + 1] = (char)('0' + y);
+                    result[(x + y * 8) * 2 + 1] = (char)('1' + y);
                 }
             }
             return result;
@@ -91,27 +96,27 @@ namespace ChessModel
         {
             Clear();
             // white
-            for (var x = 0; x < 7; ++x)
+            for (var x = 0; x < 8; ++x)
                 Add(ManColor.White, ManType.Pawn, x, 1);
             Add(ManColor.White, ManType.Rock, 0, 0);
             Add(ManColor.White, ManType.Knight, 1, 0);
             Add(ManColor.White, ManType.Bishop, 2, 0);
-            Add(ManColor.White, ManType.Queen, 5, 0);
-            Add(ManColor.White, ManType.King, 2, 0);
+            Add(ManColor.White, ManType.Queen, 3, 0);
+            Add(ManColor.White, ManType.King, 4, 0);
             Add(ManColor.White, ManType.Bishop, 5, 0);
             Add(ManColor.White, ManType.Knight, 6, 0);
             Add(ManColor.White, ManType.Rock, 7, 0);
             // black
-            for (var x = 0; x < 7; ++x)
+            for (var x = 0; x < 8; ++x)
                 Add(ManColor.Black, ManType.Pawn, x, 6);
-            Add(ManColor.Black, ManType.Rock, 0, 8);
-            Add(ManColor.Black, ManType.Knight, 1, 8);
-            Add(ManColor.Black, ManType.Bishop, 2, 8);
-            Add(ManColor.Black, ManType.Queen, 5, 8);
-            Add(ManColor.Black, ManType.King, 2, 8);
-            Add(ManColor.Black, ManType.Bishop, 5, 8);
-            Add(ManColor.Black, ManType.Knight, 6, 8);
-            Add(ManColor.Black, ManType.Rock, 7, 8);
+            Add(ManColor.Black, ManType.Rock, 0, 7);
+            Add(ManColor.Black, ManType.Knight, 1, 7);
+            Add(ManColor.Black, ManType.Bishop, 2, 7);
+            Add(ManColor.Black, ManType.Queen, 3, 7);
+            Add(ManColor.Black, ManType.King, 4, 7);
+            Add(ManColor.Black, ManType.Bishop, 5, 7);
+            Add(ManColor.Black, ManType.Knight, 6, 7);
+            Add(ManColor.Black, ManType.Rock, 7, 7);
         }
     }
 }

@@ -41,6 +41,8 @@
             </div>
         </div>
 
+        @Html.ActionLink("New Game", "NewGame", "Game")
+
         <div data-bind="foreach: errors" class="padding-error">
             <p class="text-danger" data-bind="text: $data"></p>
         </div>
