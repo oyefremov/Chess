@@ -1,15 +1,24 @@
-﻿@model ChessModel.Board
+﻿@using System.Web.Mvc
+@model ChessModel.Board
 
 <table>
-    @for (var y = 0; y < 8; y++)
+    @for (var y = 7; y >= 0; y--)
     {        
         <tr>
+            <td>@((char)('A' + y))</td>
             @for (var x = 0; x < 8; x++)
             {
-                <td>
-                    @x @y
+                <td bgcolor="@(((x+y)&1)==1?"yellow":"brown")" >
+                    [**]
                 </td>
             }
         </tr>
     }
+    <tr>
+        <td></td>
+        @for (var x = 0; x < 8; x++)
+        {
+            <td>@((char)('1' + x))</td>            
+        }
+    </tr>
 </table>

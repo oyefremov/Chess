@@ -53,6 +53,14 @@ namespace ChessModel
             return new String(fieldNames, (x + y * 8) * 2, 2);
         }
 
+        public String FieldColorCode(int x, int y)
+        {
+            if (((x + y) & 1) == 0)
+                return "B";
+            else
+                return "W";
+        }
+
         public void Add(Man man, int x, int y)
         {
             if (cells[x, y].man != null)
