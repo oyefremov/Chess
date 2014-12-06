@@ -53,13 +53,28 @@ td.square {
     text-align: center;
     font-size: xx-large;
     font-weight: bold;
+    cursor: pointer;
 }
 
-td.white {
+div.figure {
+    color: white;
+    text-shadow: 2px 0px black,
+                 0px 2px black,
+                -2px 0px black,
+                0px -2px black;
+}
+
+div.active {
+    text-shadow: 2px 0px green,
+                 0px 2px green,
+                -2px 0px green,
+                0px -2px green;
+}
+
+tr:nth-child(odd) td:nth-child(even).square, tr:nth-child(even) td:nth-child(odd).square{
     background-color: yellow;
 }
-
-td.black {
+tr:nth-child(odd) td:nth-child(odd).square, tr:nth-child(even) td:nth-child(even).square{
     background-color: brown;
 }
 

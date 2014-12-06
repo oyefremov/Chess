@@ -8,7 +8,8 @@
             <td>@((char)('A' + y))</td>
             @for (var x = 0; x < 8; x++)
             {
-                <td class="square @(((x+y)&1)==1?"white":"black")">
+                <td class="square">
+                    <div class="figure">&#9818;</div>
                 </td>
             }
         </tr>
@@ -21,3 +22,28 @@
         }
     </tr>
 </table>
+
+<script type="text/javascript">
+    //<![CDATA[
+    $('.figure').draggable({ containment: "table", revert: 'invalid' });
+
+    $('.square').droppable({
+        drop: function (ev, ui) {
+            var dropped = ui.draggable;
+            var droppedOn = $(this);
+            $(dropped).parent().droppable("enable");
+            droppedOn.empty();
+            $(dropped).detach().css({ top: 0, left: 0 }).appendTo(droppedOn);
+        }
+    });
+
+    //$(".figure")
+    //    .mousedown(function () {
+    //    $(this).addClass("active");
+    //    })
+    //    .mouseup(function () {
+    //        $(this).removeClass("active");
+    //    });
+
+    //]]>
+</script>
