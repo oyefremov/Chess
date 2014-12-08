@@ -161,5 +161,13 @@ namespace ChessModel
             var man = Cell(x, y);
             return man != null && man.Color != c;
         }
+
+        internal static bool IsEmptyOrNotColor(ManColor color, int p1, int p2)
+        {
+            if (!CheckRange(x) || !CheckRange(y))
+                return false;
+            var man = Cell(x, y);
+            return man == null || man.Color != color;
+        }
     }
 }

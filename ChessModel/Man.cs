@@ -69,12 +69,21 @@ namespace ChessModel
 
     public class Knight : Man
     {
+        static int[] dx = new int[] {1, 1, -1, -1, 2, 2, -2, -2 };
+        static int[] dy = new int[] {2, -2, 2, -2, 1, -1, 1, -1 };
         public Knight(ManColor color) { Color = color; }
         public override string Name { get { return "Knight"; } }
         public override string WhiteCharCode { get { return "\u2658"; } } // U+2658 White Chess Knight (HTML &#9816;)
         public override string BlackCharCode { get { return "\u265E"; } } // U+265E Black Chess Knight (HTML &#9822;)
         public override ManType ManType { get { return ManType.Knight; } }
-        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
+        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y)
+        {
+            for (int i = 0; i < 8; ++i )
+            {
+                if (Board.IsEmptyOrNotColor(Color, x + dx[i], y + dy[i]))
+                    yield return new BoardCellPos(x + dx[i], y + dy[i]);
+            }
+        }
     }
 
     public class Bishop : Man
