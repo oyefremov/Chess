@@ -42,18 +42,18 @@ namespace ChessModel
         public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y)
         {
             int dy = Color == ManColor.White ? 1 : -1;
-            if (Board.CheckRange(y + dy) && Board.Cell(x, y + dy) == null)
+            if (Board.IsEmpty(x, y + dy))
             {
                 yield return new BoardCellPos(x, y + dy);
-                if (y == 1 && Color == ManColor.White && Board.Cell(x, 3) == null)
-                {
+                if (y == 1 && Color == ManColor.White && Board.IsEmpty(x, 3))
                     yield return new BoardCellPos(x, 3);
-                }
-                else if (y == 6 && Color == ManColor.Black && Board.Cell(x, 4) == null)
-                {
+                else if (y == 6 && Color == ManColor.Black && Board.IsEmpty(x, 4))
                     yield return new BoardCellPos(x, 4);
-                }
             }
+            if (Board.IsColorNot(Color, x - 1, y + dy))
+                yield return new BoardCellPos(x - 1, y + dy);
+            if (Board.IsColorNot(Color, x + 1, y + dy))
+                yield return new BoardCellPos(x + 1, y + dy);
         }
     }
 

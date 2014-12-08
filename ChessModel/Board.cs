@@ -140,5 +140,26 @@ namespace ChessModel
             cells[x2, y2].man = cells[x1, y1].man;
             cells[x1, y1].man = null;
         }
+
+        internal bool IsEmpty(int x, int y)
+        {
+            return CheckRange(x) && CheckRange(y) && Cell(x, y) == null;
+        }
+
+        internal bool IsColor(ManColor c, int x, int y)
+        {
+            if (!CheckRange(x) || !CheckRange(y))
+                return false;
+            var man = Cell(x, y);
+            return man != null && man.Color == c;
+        }
+
+        internal bool IsColorNot(ManColor c, int x, int y)
+        {
+            if (!CheckRange(x) || !CheckRange(y))
+                return false;
+            var man = Cell(x, y);
+            return man != null && man.Color != c;
+        }
     }
 }
