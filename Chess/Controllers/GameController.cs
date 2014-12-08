@@ -24,7 +24,22 @@ namespace Chess.Controllers
         {
             var game = GamesManager.Instance.CreateGame();
             return RedirectToAction("", new { id = game.Id });
-//            return View(game);
-        }        
-	}
+        }
+
+        public ActionResult MakeMove(int id, string move)
+        {
+            var game = GamesManager.Instance.GetGame(id);
+            if (game == null)
+                return Content("Game with id " + id + " not available");
+
+            try {
+                game.MakeMove(move);
+            }
+            catch (Exception e)
+            {
+                return Content("Invalid move " + move + " : " + e.Message);
+            }
+            return RedirectToAction("", new { id = game.Id });
+        }
+    }
 }

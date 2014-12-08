@@ -134,5 +134,11 @@ namespace ChessModel
             Add(ManColor.Black, ManType.Knight, 6, 7);
             Add(ManColor.Black, ManType.Rock, 7, 7);
         }
+
+        public void Move(int x1, int x2, int y1, int y2)
+        {
+            cells[x2, y2].man = cells[x1, y1].man;
+            cells[x1, y1].man = null;
+        }
     }
 }

@@ -8,6 +8,15 @@
 <br/>
 @Html.Partial("Board", Model)
 
+@using(Html.BeginForm("MakeMove", "Game", FormMethod.Get))
+{
+    <input type="text" name="id" value="@Model.Id" />
+    <input type="text" name="move" value="" />
+    <input type="submit" value="Move" />
+}
+
+
+
 <script type="text/javascript">
     //<![CDATA[
     $('.movable').draggable({
@@ -21,9 +30,14 @@
             var droppedOn = $(this);
             
             if ($(dropped).attr("data-move-to").indexOf(droppedOn.attr("id")) >= 0) {
-                $(dropped).parent().droppable("enable");
-                droppedOn.empty();
-                $(dropped).detach().css({ top: 0, left: 0 }).appendTo(droppedOn);
+
+                var moveForm = document.forms[0];
+                moveForm.elements["move"].value = $(dropped).parent().attr("id") + "-" + droppedOn.attr("id");
+                moveForm.submit();
+
+                //$(dropped).parent().droppable("enable");
+                //droppedOn.empty();
+                //$(dropped).detach().css({ top: 0, left: 0 }).appendTo(droppedOn);
             }
             else {
                 $(dropped).css({ top: 0, left: 0 })
