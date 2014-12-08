@@ -17,6 +17,7 @@ namespace ChessModel
         public ManColor Color {get; set;}
         public int X { get; set; }
         public int Y { get; set; }
+        public string MoveToFields { get; set; }
 
         public abstract string Name { get; }
         public abstract string WhiteCharCode { get; }
@@ -26,6 +27,8 @@ namespace ChessModel
         {
             return "" + Color + " " + Name;
         }
+
+        public abstract IEnumerable<BoardCellPos> Turns(Board Board, int x, int y);
     }
 
     public class Pawn : Man
@@ -35,6 +38,23 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2659"; } } // U+2659 White Chess Pawn (HTML &#9817;)
         public override string BlackCharCode { get { return "\u265F"; } } // U+265F Black Chess Pawn (HTML &#9823;)
         public override ManType ManType { get { return ManType.Pawn; } }
+
+        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y)
+        {
+            int dy = Color == ManColor.White ? 1 : -1;
+            if (Board.CheckRange(y + dy) && Board.Cell(x, y + dy) == null)
+            {
+                yield return new BoardCellPos(x, y + dy);
+                if (y == 1 && Color == ManColor.White && Board.Cell(x, 3) == null)
+                {
+                    yield return new BoardCellPos(x, 3);
+                }
+                else if (y == 6 && Color == ManColor.Black && Board.Cell(x, 4) == null)
+                {
+                    yield return new BoardCellPos(x, 4);
+                }
+            }
+        }
     }
 
     public class Rock : Man
@@ -44,6 +64,7 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2656"; } } // U+2656 White Chess Rook (HTML &#9814;)
         public override string BlackCharCode { get { return "\u265C"; } } // U+265C Black Chess Rook (HTML &#9820;)
         public override ManType ManType { get { return ManType.Rock; } }
+        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
     }
 
     public class Knight : Man
@@ -53,6 +74,7 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2658"; } } // U+2658 White Chess Knight (HTML &#9816;)
         public override string BlackCharCode { get { return "\u265E"; } } // U+265E Black Chess Knight (HTML &#9822;)
         public override ManType ManType { get { return ManType.Knight; } }
+        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
     }
 
     public class Bishop : Man
@@ -62,6 +84,7 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2657"; } } // U+2657 White Chess Bishop (HTML &#9815;)
         public override string BlackCharCode { get { return "\u265D"; } } // U+265D Black Chess Bishop (HTML &#9821;)
         public override ManType ManType { get { return ManType.Bishop; } }
+        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
     }
 
     public class King : Man
@@ -71,6 +94,7 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2654"; } } // U+2654 White Chess King (HTML &#9812;)
         public override string BlackCharCode { get { return "\u265A"; } } // U+265A Black Chess King (HTML &#9818;)
         public override ManType ManType { get { return ManType.King; } }
+        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
     }
 
     public class Queen : Man
@@ -80,5 +104,6 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2655"; } } // U+2655 White Chess Queen (HTML &#9813;)
         public override string BlackCharCode { get { return "\u265B"; } } // U+265B Black Chess Queen (HTML &#9819;)
         public override ManType ManType { get { return ManType.Queen; } }
+        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
     }
 }

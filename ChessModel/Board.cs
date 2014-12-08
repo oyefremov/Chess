@@ -12,6 +12,12 @@ namespace ChessModel
         public Man man;
     }
 
+    public struct BoardCellPos
+    {
+        public BoardCellPos(int x, int y) { this.x = x; this.y = y; }
+        public int x, y;
+    }
+
     public class Board
     {
         List<Man> whiteMans = new List<Man>();
@@ -30,14 +36,16 @@ namespace ChessModel
             Array.Clear(cells, 0, cells.Length);
         }
 
+        public static bool CheckRange(int x) { return x >= 0 && x < 8; }
+
         private static Char[] fieldNames = getFieldnames();
 
         private static Char[] getFieldnames()
         {
             Char[] result = new Char[8 * 8 * 2];
-            for (int y = 0; y < 7; ++y)
+            for (int y = 0; y < 8; ++y)
             {
-                for (int x = 0; x < 7; ++x)
+                for (int x = 0; x < 8; ++x)
                 {
                     result[(x + y * 8) * 2 + 0] = (char)('A' + x);
                     result[(x + y * 8) * 2 + 1] = (char)('1' + y);

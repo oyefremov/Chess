@@ -6,4 +6,38 @@
 
 <h2>Game @Model.Id</h2>
 <br/>
-@Html.Partial("Board", Model.Board)
+@Html.Partial("Board", Model)
+
+<script type="text/javascript">
+    //<![CDATA[
+    $('.movable').draggable({
+        containment: "table",
+        revert: 'invalid'
+    });
+
+    $('.square').droppable({
+        drop: function (ev, ui) {
+            var dropped = ui.draggable;
+            var droppedOn = $(this);
+            
+            if ($(dropped).attr("data-move-to").indexOf(droppedOn.attr("id")) >= 0) {
+                $(dropped).parent().droppable("enable");
+                droppedOn.empty();
+                $(dropped).detach().css({ top: 0, left: 0 }).appendTo(droppedOn);
+            }
+            else {
+                $(dropped).css({ top: 0, left: 0 })
+            }
+        }
+    });
+
+    //$(".figure")
+    //    .mousedown(function () {
+    //    $(this).addClass("active");
+    //    })
+    //    .mouseup(function () {
+    //        $(this).removeClass("active");
+    //    });
+
+    //]]>
+</script>

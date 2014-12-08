@@ -1,18 +1,22 @@
 ﻿@using System.Web.Mvc
-@model ChessModel.Board
+@using ChessModel
+@model ChessModel.Game
 
 <table>
+    @{var moves = Model.AvailableMoves;}
     @for (var y = 7; y >= 0; y--)
     {        
         <tr>
-            <td>@((char)('A' + y))</td>
+            <td>@((char)('1' + y))</td>
             @for (var x = 0; x < 8; x++)
             {
-                var man = Model.Cell(x, y);
-                <td class="square">
+                var man = Model.Board.Cell(x, y);
+                var cell = Board.FieldName(x, y);
+                <td class="square" id="@cell">
                     @if (man != null)
                     {
-                        <div class="man @(man.Color)">@man.BlackCharCode</div>
+                        string moveTo = man.MoveToFields;
+                        <div class="man @(man.Color) @(moveTo.IsEmpty() ? "" : "movable")" data-move-to="@moveTo">@man.BlackCharCode</div>
                     }
                 </td>
             }
@@ -22,32 +26,7 @@
         <td></td>
         @for (var x = 0; x < 8; x++)
         {
-            <td align="center">@((char)('1' + x))</td>
+            <td align="center">@((char)('A' + x))</td>
         }
     </tr>
 </table>
-
-<script type="text/javascript">
-    //<![CDATA[
-    $('.man').draggable({ containment: "table", revert: 'invalid' });
-
-    $('.square').droppable({
-        drop: function (ev, ui) {
-            var dropped = ui.draggable;
-            var droppedOn = $(this);
-            $(dropped).parent().droppable("enable");
-            droppedOn.empty();
-            $(dropped).detach().css({ top: 0, left: 0 }).appendTo(droppedOn);
-        }
-    });
-
-    //$(".figure")
-    //    .mousedown(function () {
-    //    $(this).addClass("active");
-    //    })
-    //    .mouseup(function () {
-    //        $(this).removeClass("active");
-    //    });
-
-    //]]>
-</script>
