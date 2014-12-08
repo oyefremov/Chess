@@ -56,7 +56,7 @@ td.square {
     cursor: pointer;
 }
 
-div.figure {
+div.White {
     color: white;
     text-shadow: 2px 0px black,
                  0px 2px black,
@@ -64,11 +64,12 @@ div.figure {
                 0px -2px black;
 }
 
-div.active {
-    text-shadow: 2px 0px green,
-                 0px 2px green,
-                -2px 0px green,
-                0px -2px green;
+div.Black {
+    color: black;
+    text-shadow: 2px 0px white,
+                 0px 2px white,
+                -2px 0px white,
+                0px -2px white;
 }
 
 tr:nth-child(odd) td:nth-child(even).square, tr:nth-child(even) td:nth-child(odd).square{

@@ -8,8 +8,12 @@
             <td>@((char)('A' + y))</td>
             @for (var x = 0; x < 8; x++)
             {
+                var man = Model.Cell(x, y);
                 <td class="square">
-                    <div class="figure">&#9818;</div>
+                    @if (man != null)
+                    {
+                        <div class="man @(man.Color)">@man.BlackCharCode</div>
+                    }
                 </td>
             }
         </tr>
@@ -25,7 +29,7 @@
 
 <script type="text/javascript">
     //<![CDATA[
-    $('.figure').draggable({ containment: "table", revert: 'invalid' });
+    $('.man').draggable({ containment: "table", revert: 'invalid' });
 
     $('.square').droppable({
         drop: function (ev, ui) {
