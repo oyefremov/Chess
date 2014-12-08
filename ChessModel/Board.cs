@@ -18,7 +18,7 @@ namespace ChessModel
         List<Man> blackMans = new List<Man>();
         BoardCell[,] cells = new BoardCell[8, 8];
 
-        Man Cell(int x, int y)
+        public Man Cell(int x, int y)
         {
             return cells[x, y].man;
         }
@@ -53,12 +53,12 @@ namespace ChessModel
             return new String(fieldNames, (x + y * 8) * 2, 2);
         }
 
-        public String FieldColorCode(int x, int y)
+        public ManColor FieldColorCode(int x, int y)
         {
             if (((x + y) & 1) == 0)
-                return "B";
+                return ManColor.Black;
             else
-                return "W";
+                return ManColor.White;
         }
 
         public void Add(Man man, int x, int y)
