@@ -162,7 +162,7 @@ namespace ChessModel
             return man != null && man.Color != c;
         }
 
-        internal static bool IsEmptyOrNotColor(ManColor color, int p1, int p2)
+        internal bool IsEmptyOrNotColor(ManColor color, int x, int y)
         {
             if (!CheckRange(x) || !CheckRange(y))
                 return false;

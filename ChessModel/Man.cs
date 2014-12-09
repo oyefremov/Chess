@@ -29,6 +29,34 @@ namespace ChessModel
         }
 
         public abstract IEnumerable<BoardCellPos> Turns(Board Board, int x, int y);
+
+        protected IEnumerable<BoardCellPos> TurnsHelper(Board Board, int manX, int manY, int[] dirX, int[] dirY)
+        {
+            if (dirX.Length != dirY.Length)
+                throw new ArgumentException("dirX.Length != dirY.Length");
+            for (int i = 0; i < dirX.Length; ++i)
+            {
+                int dx = dirX[i];
+                int dy = dirY[i];
+                int x = manX;
+                int y = manY;
+                for (int j = 0; j < 7; ++j)
+                {
+                    x += dx;
+                    y += dy;
+                    if (Board.IsEmpty(x, y))
+                    {
+                        yield return new BoardCellPos(x, y);
+                        continue;
+                    }
+                    if (Board.IsColorNot(Color, x, y))
+                    {
+                        yield return new BoardCellPos(x, y);
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     public class Pawn : Man
@@ -59,12 +87,14 @@ namespace ChessModel
 
     public class Rock : Man
     {
+        private static int[] dx = new int[] { 1, -1, 0, 0 };
+        private static int[] dy = new int[] { 0, 0, 1, -1 };
         public Rock(ManColor color) { Color = color; }
         public override string Name { get { return "Rock"; } }
         public override string WhiteCharCode { get { return "\u2656"; } } // U+2656 White Chess Rook (HTML &#9814;)
         public override string BlackCharCode { get { return "\u265C"; } } // U+265C Black Chess Rook (HTML &#9820;)
         public override ManType ManType { get { return ManType.Rock; } }
-        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
+        public override IEnumerable<BoardCellPos> Turns(Board board, int x, int y) { return TurnsHelper(board, x, y, dx, dy); }
     }
 
     public class Knight : Man
@@ -88,12 +118,14 @@ namespace ChessModel
 
     public class Bishop : Man
     {
+        private static int[] dx = new int[] { 1, -1, -1, 1 };
+        private static int[] dy = new int[] { 1, 1, -1, -1 };
         public Bishop(ManColor color) { Color = color; }
         public override string Name { get { return "Bishop"; } }
         public override string WhiteCharCode { get { return "\u2657"; } } // U+2657 White Chess Bishop (HTML &#9815;)
         public override string BlackCharCode { get { return "\u265D"; } } // U+265D Black Chess Bishop (HTML &#9821;)
         public override ManType ManType { get { return ManType.Bishop; } }
-        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
+        public override IEnumerable<BoardCellPos> Turns(Board board, int x, int y) { return TurnsHelper(board, x, y, dx, dy); }
     }
 
     public class King : Man
@@ -108,11 +140,13 @@ namespace ChessModel
 
     public class Queen : Man
     {
+        private static int[] dx = new int[] { 1, -1, 0, 0, 1, -1, -1, 1 };
+        private static int[] dy = new int[] { 0, 0, 1, -1, 1, 1, -1, -1 };
         public Queen(ManColor color) { Color = color; }
         public override string Name { get { return "Queen"; } }
         public override string WhiteCharCode { get { return "\u2655"; } } // U+2655 White Chess Queen (HTML &#9813;)
         public override string BlackCharCode { get { return "\u265B"; } } // U+265B Black Chess Queen (HTML &#9819;)
         public override ManType ManType { get { return ManType.Queen; } }
-        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
+        public override IEnumerable<BoardCellPos> Turns(Board board, int x, int y) { return TurnsHelper(board, x, y, dx, dy); }
     }
 }
