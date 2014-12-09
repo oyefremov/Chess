@@ -29,6 +29,17 @@ namespace ChessModel
             return cells[x, y].man;
         }
 
+        public Man SetMan(int x, int y, Man man)
+        {
+            return cells[x, y].man = man;
+        }
+
+        public void MoveMan(int x1, int y1, int x2, int y2)
+        {
+            cells[x2, y2].man = cells[x1, y1].man;
+            cells[x1, y1].man = null;
+        }
+
         public void Clear()
         {
             whiteMans.Clear();
