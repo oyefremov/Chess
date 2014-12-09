@@ -266,5 +266,77 @@ namespace ChessModel
         public static int LastTwoSquarepawnMoveX { get; set; }
 
         public static int LastTwoSquarepawnMoveY { get; set; }
+
+        internal bool TestForCheck(ManColor color)
+        {
+            // find king
+            int kingX, kingY;
+            for (kingY = 0; kingY < 8; ++kingY)
+            {
+                for (kingX = 0; kingX < 8; ++kingX)
+                {
+                    var king = Cell(kingX, kingY);
+                    if (king != null && king.ManType == ManType.King && king.Color == color)
+                        goto kingExists;
+                }
+            }
+            throw new InvalidOperationException("" + color + " King not found");
+
+            kingExists:
+
+            ManColor alienColor = color == ManColor.White ? ManColor.Black : ManColor.White;
+
+            // knight and king attack
+            for (int i=0; i<8; ++i)
+            {
+                if (IsManAt(alienColor, ManType.Knight, kingX + Knight.dx[i], kingY + Knight.dy[i]))
+                    return true;
+                if (IsManAt(alienColor, ManType.King, kingX + Man.allDx[i], kingY + Man.allDx[i]))
+                    return true;
+            }
+
+            // pawn atack
+            int alienPawnDir = alienColor == ManColor.White ? 1 : -1;
+            if (IsManAt(alienColor, ManType.Pawn, kingX - 1, kingY - alienPawnDir) ||
+                IsManAt(alienColor, ManType.Pawn, kingX + 1, kingY - alienPawnDir))
+                return true;
+
+            // bishop, rock and queen
+            return TestForCheckHelper(kingX, kingY, alienColor, ManType.Bishop, Bishop.dx, Bishop.dy)
+                || TestForCheckHelper(kingX, kingY, alienColor, ManType.Rock, Rock.dx, Rock.dy);
+        }
+
+        private bool TestForCheckHelper(int kingX, int kingY, ManColor alienColor, ManType manType, int[] dx, int[] dy)
+        {
+            if (dx.Length != dy.Length)
+                throw new ArgumentException("dx.Length != dy.Length");
+            for (int i=0; i<dx.Length; ++i)
+            {
+                int x = kingX;
+                int y = kingY;
+                for (int j=0; j<7; ++j)
+                {
+                    x += dx[i];
+                    y += dy[i];
+                    if (!CheckRange(x) || !CheckRange(y)) break;
+                    var man = Cell(x, y);
+                    if (man != null)
+                    {
+                        if (man.Color == alienColor && (man.ManType == manType || man.ManType == ManType.Queen))
+                            return true;
+                        break;
+                    }                    
+                }
+            }
+            return false;
+        }
+
+        private bool IsManAt(ManColor color, ManType manType, int x, int y)
+        {
+            if (!CheckRange(x) || !CheckRange(y))
+                return false;
+            var man = Cell(x, y);
+            return man != null && man.ManType == manType && man.Color == color;
+        }
     }
 }

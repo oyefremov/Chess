@@ -12,7 +12,7 @@ namespace ChessModel
         {
             Board.InitialSetup();
             CurrentTurnSide = ManColor.White;
-            CalculateTurns();
+            CalculateTurns2();
         }
 
         private Board board = new Board();
@@ -45,6 +45,34 @@ namespace ChessModel
                 }
             }
         }
+        void CalculateTurns2()
+        {
+            for (int y = 0; y < 8; ++y)
+                for (int x = 0; x < 8; ++x)
+                {
+                    var man = Board.Cell(x, y);
+                    if (man == null)
+                        continue;
+                    if (man.Color != CurrentTurnSide)
+                    {
+                        man.MoveToFields = "";
+                    }
+                    else
+                    {
+                        StringBuilder moveToFields = new StringBuilder();
+                        foreach (var turn in man.Turns2(Board, x, y))
+                        {
+                            turn.Do(Board);
+                            if (!Board.TestForCheck(CurrentTurnSide))
+                            {
+                                moveToFields.Append(Board.FieldName(turn.X2, turn.Y2));
+                            }
+                            turn.Undo(Board);
+                        }
+                        man.MoveToFields = moveToFields.ToString();
+                    }
+                }
+        }
 
         public void MakeMove(string move)
         {
@@ -57,7 +85,7 @@ namespace ChessModel
                 throw new ArgumentException("Not a valid move " + move);
             Board.Move(x1, y1, x2, y2);
             ChangeSide();
-            CalculateTurns();
+            CalculateTurns2();
         }
 
         private void ChangeSide()

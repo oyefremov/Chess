@@ -85,9 +85,8 @@ namespace ChessModel
                 }
             }
         }
-        protected static int[] allDx = new int[] { 1, -1, 0, 0, 1, -1, -1, 1 };
-        protected static int[] allDy = new int[] { 0, 0, 1, -1, 1, 1, -1, -1 };
-
+        public static int[] allDx = new int[] { 1, -1, 0, 0, 1, -1, -1, 1 };
+        public static int[] allDy = new int[] { 0, 0, 1, -1, 1, 1, -1, -1 };
     }
 
     public class Pawn : Man
@@ -147,8 +146,8 @@ namespace ChessModel
 
     public class Rock : Man
     {
-        private static int[] dx = new int[] { 1, -1, 0, 0 };
-        private static int[] dy = new int[] { 0, 0, 1, -1 };
+        public static int[] dx = new int[] { 1, -1, 0, 0 };
+        public static int[] dy = new int[] { 0, 0, 1, -1 };
         public Rock(ManColor color) { Color = color; }
         public override string Name { get { return "Rock"; } }
         public override string WhiteCharCode { get { return "\u2656"; } } // U+2656 White Chess Rook (HTML &#9814;)
@@ -160,8 +159,8 @@ namespace ChessModel
 
     public class Knight : Man
     {
-        static int[] dx = new int[] {1, 1, -1, -1, 2, 2, -2, -2 };
-        static int[] dy = new int[] {2, -2, 2, -2, 1, -1, 1, -1 };
+        public static int[] dx = new int[] {1, 1, -1, -1, 2, 2, -2, -2 };
+        public static int[] dy = new int[] {2, -2, 2, -2, 1, -1, 1, -1 };
         public Knight(ManColor color) { Color = color; }
         public override string Name { get { return "Knight"; } }
         public override string WhiteCharCode { get { return "\u2658"; } } // U+2658 White Chess Knight (HTML &#9816;)
@@ -187,8 +186,8 @@ namespace ChessModel
 
     public class Bishop : Man
     {
-        private static int[] dx = new int[] { 1, -1, -1, 1 };
-        private static int[] dy = new int[] { 1, 1, -1, -1 };
+        public static int[] dx = new int[] { 1, -1, -1, 1 };
+        public static int[] dy = new int[] { 1, 1, -1, -1 };
         public Bishop(ManColor color) { Color = color; }
         public override string Name { get { return "Bishop"; } }
         public override string WhiteCharCode { get { return "\u2657"; } } // U+2657 White Chess Bishop (HTML &#9815;)
