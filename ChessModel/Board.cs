@@ -133,12 +133,79 @@ namespace ChessModel
             Add(ManColor.Black, ManType.Bishop, 5, 7);
             Add(ManColor.Black, ManType.Knight, 6, 7);
             Add(ManColor.Black, ManType.Rock, 7, 7);
+
+            IsCheck = false;
+            IsRockA1AvailableForCastling = true;
+            IsRockH1AvailableForCastling = true;
+            IsRockA8AvailableForCastling = true;
+            IsRockH8AvailableForCastling = true;
+            LastTwoSquarepawnMoveX = -1;
+            LastTwoSquarepawnMoveY = -1;
         }
 
-        public void Move(int x1, int x2, int y1, int y2)
+        public void Move(int x1, int y1, int x2, int y2)
         {
-            cells[x2, y2].man = cells[x1, y1].man;
+            LastTwoSquarepawnMoveX = -1;
+            LastTwoSquarepawnMoveY = -1;
+
+            var man = cells[x1, y1].man;
             cells[x1, y1].man = null;
+            if (man.ManType == ManType.Pawn)
+            {
+                if (y2 == 0 || y2 == 7)
+                {
+                    man = new Queen(man.Color);
+                }
+                else if (Math.Abs(y1 - y2) == 2)
+                {
+                    LastTwoSquarepawnMoveX = x2;
+                    LastTwoSquarepawnMoveY = y2;
+                }
+                else if (x1 != x2 && cells[x2, y2].man == null)
+                {
+                    cells[x2, y1].man = null;
+                }
+            }
+            else if (man.ManType == ManType.King)
+            {
+                // castling
+                if (Math.Abs(x1 - x2) == 2)
+                {
+                    if (x2 < x1)
+                    {
+                        cells[3, y2].man = cells[0, y2].man;
+                        cells[0, y2].man = null;
+                    }
+                    else
+                    {
+                        cells[5, y2].man = cells[7, y2].man;
+                        cells[7, y2].man = null;
+                    }
+                }
+                if (man.Color == ManColor.White)
+                {
+                    IsRockA1AvailableForCastling = false;
+                    IsRockH1AvailableForCastling = false;
+                }
+                else if (man.Color == ManColor.Black)
+                {
+                    IsRockA8AvailableForCastling = false;
+                    IsRockH8AvailableForCastling = false;
+                }
+            }
+            if (man.ManType == ManType.Rock)
+            {
+                if (x1 == 0 && y1 == 0)
+                    IsRockA1AvailableForCastling = false;
+                else if (x1 == 7 && y1 == 0)
+                    IsRockH1AvailableForCastling = false;
+                if (x1 == 0 && y1 == 7)
+                    IsRockA8AvailableForCastling = false;
+                else if (x1 == 7 && y1 == 7)
+                    IsRockH8AvailableForCastling = false;
+            }
+            
+            cells[x2, y2].man = man;
         }
 
         internal bool IsEmpty(int x, int y)
@@ -169,5 +236,24 @@ namespace ChessModel
             var man = Cell(x, y);
             return man == null || man.Color != color;
         }
+
+        public static bool IsCheck { get; set; }
+
+        public static bool IsRockA1AvailableForCastling { get; set; }
+
+        public static bool IsRockH1AvailableForCastling { get; set; }
+
+        public static bool IsRockA8AvailableForCastling { get; set; }
+
+        public static bool IsRockH8AvailableForCastling { get; set; }
+
+        internal static bool IsCheckAt(ManColor Color, int p1, int p2)
+        {
+            return false;
+        }
+
+        public static int LastTwoSquarepawnMoveX { get; set; }
+
+        public static int LastTwoSquarepawnMoveY { get; set; }
     }
 }

@@ -55,7 +55,7 @@ namespace ChessModel
                 throw new ArgumentException("Field " + move.Substring(0, 2) + " is empty");
             if (man.MoveToFields.IndexOf(move.Substring(3, 2)) == -1)
                 throw new ArgumentException("Not a valid move " + move);
-            Board.Move(x1, x2, y1, y2);
+            Board.Move(x1, y1, x2, y2);
             ChangeSide();
             CalculateTurns();
         }

@@ -57,6 +57,9 @@ namespace ChessModel
                 }
             }
         }
+        protected static int[] allDx = new int[] { 1, -1, 0, 0, 1, -1, -1, 1 };
+        protected static int[] allDy = new int[] { 0, 0, 1, -1, 1, 1, -1, -1 };
+
     }
 
     public class Pawn : Man
@@ -82,6 +85,12 @@ namespace ChessModel
                 yield return new BoardCellPos(x - 1, y + dy);
             if (Board.IsColorNot(Color, x + 1, y + dy))
                 yield return new BoardCellPos(x + 1, y + dy);
+
+            // take on two square pawn move
+            if (Board.LastTwoSquarepawnMoveY == y && Math.Abs(Board.LastTwoSquarepawnMoveX - x) == 1)
+            {
+                yield return new BoardCellPos(Board.LastTwoSquarepawnMoveX, y + dy);
+            }
         }
     }
 
@@ -135,18 +144,69 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2654"; } } // U+2654 White Chess King (HTML &#9812;)
         public override string BlackCharCode { get { return "\u265A"; } } // U+265A Black Chess King (HTML &#9818;)
         public override ManType ManType { get { return ManType.King; } }
-        public override IEnumerable<BoardCellPos> Turns(Board Board, int x, int y) { yield break; }
+        public override IEnumerable<BoardCellPos> Turns(Board Board, int manX, int manY) 
+        {
+            if (allDx.Length != allDy.Length)
+                throw new ArgumentException("allDx.Length != allDy.Length");
+            for (int i = 0; i < allDx.Length; ++i)
+            {
+                int x = manX + allDx[i];
+                int y = manY + allDy[i];
+                if (Board.IsEmptyOrNotColor(Color, x, y))
+                {
+                    yield return new BoardCellPos(x, y);
+                }
+            }
+            // Castling
+            if (!Board.IsCheck)
+            {
+                if (Color == ManColor.White)
+                {
+                    if (Board.IsRockA1AvailableForCastling &&
+                        Board.IsEmpty(1, 0) &&
+                        Board.IsEmpty(2, 0) &&
+                        Board.IsEmpty(3, 0) &&
+                        !Board.IsCheckAt(Color, 3, 0))
+                    {
+                        yield return new BoardCellPos(2, 0);
+                    }
+                    if (Board.IsRockH1AvailableForCastling &&
+                        Board.IsEmpty(5, 0) &&
+                        Board.IsEmpty(6, 0) &&
+                        !Board.IsCheckAt(Color, 5, 0))
+                    {
+                        yield return new BoardCellPos(6, 0);
+                    }
+                }
+                else if (Color == ManColor.Black)
+                {
+                    if (Board.IsRockA8AvailableForCastling &&
+                        Board.IsEmpty(1, 7) &&
+                        Board.IsEmpty(2, 7) &&
+                        Board.IsEmpty(3, 7) &&
+                        !Board.IsCheckAt(Color, 3, 7))
+                    {
+                        yield return new BoardCellPos(2, 0);
+                    }
+                    if (Board.IsRockH8AvailableForCastling &&
+                        Board.IsEmpty(5, 7) &&
+                        Board.IsEmpty(6, 7) &&
+                        !Board.IsCheckAt(Color, 5, 7))
+                    {
+                        yield return new BoardCellPos(6, 7);
+                    }
+                }
+            }
+        }
     }
 
     public class Queen : Man
     {
-        private static int[] dx = new int[] { 1, -1, 0, 0, 1, -1, -1, 1 };
-        private static int[] dy = new int[] { 0, 0, 1, -1, 1, 1, -1, -1 };
         public Queen(ManColor color) { Color = color; }
         public override string Name { get { return "Queen"; } }
         public override string WhiteCharCode { get { return "\u2655"; } } // U+2655 White Chess Queen (HTML &#9813;)
         public override string BlackCharCode { get { return "\u265B"; } } // U+265B Black Chess Queen (HTML &#9819;)
         public override ManType ManType { get { return ManType.Queen; } }
-        public override IEnumerable<BoardCellPos> Turns(Board board, int x, int y) { return TurnsHelper(board, x, y, dx, dy); }
+        public override IEnumerable<BoardCellPos> Turns(Board board, int x, int y) { return TurnsHelper(board, x, y, allDx, allDy); }
     }
 }
