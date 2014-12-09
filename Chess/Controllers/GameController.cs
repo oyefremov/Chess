@@ -13,7 +13,6 @@ namespace Chess.Controllers
         // GET: /Game/
         public ActionResult Index(int id)
         {
-//            return PartialView("board", id);
             var game = GamesManager.Instance.GetGame(id);
             if (game == null)
                 return Content("Game with id " + id +" not available");
@@ -27,7 +26,22 @@ namespace Chess.Controllers
 
         public ActionResult NewGame()
         {
+            if (!User.Identity.IsAuthenticated)
+                return Content("User must be authenticated");
             var game = GamesManager.Instance.CreateGame();
+            game.WhitePlayer = User.Identity.Name;
+            return RedirectToAction("", new { id = game.Id });
+        }
+
+        public ActionResult Join(int id)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Content("User must be authenticated");
+            var game = GamesManager.Instance.GetGame(id);
+            if (game == null)
+                return Content("Game with id " + id + " not available");
+            if (User.Identity.Name != game.WhitePlayer)
+                game.BlackPlayer = User.Identity.Name;
             return RedirectToAction("", new { id = game.Id });
         }
 

@@ -122,5 +122,8 @@ namespace ChessModel
         }
 
         public ManColor CurrentTurnSide { get; set; }
+
+        public string WhitePlayer { get; set; }
+        public string BlackPlayer { get; set; }
     }
 }
