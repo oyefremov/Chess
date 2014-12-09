@@ -34,5 +34,10 @@ namespace Chess.Models
         {
             return games.ContainsKey(id);
         }
+
+        public IEnumerable<KeyValuePair<int, Game>> GetGames()
+        {
+            return games;
+        }
     }
 }

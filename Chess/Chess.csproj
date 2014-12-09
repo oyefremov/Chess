@@ -286,6 +286,7 @@
     <Content Include="Views\Board\Partial1.cshtml" />
     <Content Include="Views\Game\Board.cshtml" />
     <Content Include="Views\Game\Index.cshtml" />
+    <Content Include="Views\Home\GameList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

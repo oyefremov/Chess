@@ -1,0 +1,9 @@
+﻿@model IEnumerable<KeyValuePair<int, ChessModel.Game>>
+
+
+@foreach (var game in Model)
+{
+    <div>
+        @Html.ActionLink("Game " + game.Key, "Index", "Game", new { id = game.Key }, null)
+    </div>
+}

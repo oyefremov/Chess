@@ -20,6 +20,11 @@ namespace Chess.Controllers
             return View(game);
         }
 
+        public ActionResult GameList()
+        {
+            return PartialView("games", GamesManager.Instance.GetGames());
+        }
+
         public ActionResult NewGame()
         {
             var game = GamesManager.Instance.CreateGame();
