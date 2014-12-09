@@ -6,7 +6,7 @@
     @{var moves = Model.AvailableMoves;}
     @for (var y = 7; y >= 0; y--)
     {        
-        <tr>
+        <tr class="board">
             <td>@((char)('1' + y))</td>
             @for (var x = 0; x < 8; x++)
             {
