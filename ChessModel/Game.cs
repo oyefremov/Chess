@@ -20,6 +20,9 @@ namespace ChessModel
 
         public int Id { get; set; }
 
+        private List<String> moves = new List<String>();
+        public IEnumerable<String> Moves { get { return moves; } }
+
         private List<String> availableMoves = new List<String>();
         public IEnumerable<String> AvailableMoves { get { return availableMoves; } }
         void CalculateTurns()
@@ -84,6 +87,7 @@ namespace ChessModel
             if (man.MoveToFields.IndexOf(move.Substring(3, 2)) == -1)
                 throw new ArgumentException("Not a valid move " + move);
             Board.Move(x1, y1, x2, y2);
+            moves.Add(move);
             ChangeSide();
             CalculateTurns2();
         }
