@@ -12,7 +12,7 @@ namespace ChessModel
         public int Y1 { get; private set; }
         public int X2 { get; private set; }
         public int Y2 { get; private set; }
-        protected Man removedMan;
+        public Man RemovedMan { get; private set; }
 
         public RegularMove(int x1, int y1, int x2, int y2)
         {
@@ -24,20 +24,34 @@ namespace ChessModel
 
         public virtual void Do(Board board)
         {
-            removedMan = board.Cell(X2, Y2);
+            RemovedMan = board.Cell(X2, Y2);
             board.MoveMan(X1, Y1, X2, Y2);
         }
 
         public virtual void Undo(Board board)
         {
             board.MoveMan(X2, Y2, X1, Y1);
-            board.SetMan(X2, Y2, removedMan);
+            board.SetMan(X2, Y2, RemovedMan);
         }
 
         public override string ToString()
         {
             return Board.FieldName(X1, Y1) + "-" + Board.FieldName(X2, Y2);
         }
+
+        internal string Key()
+        {
+            return Board.FieldName(X1, Y1) + "-" + Board.FieldName(X2, Y2);
+        }
+
+        public virtual bool IsPawnLongMove { get {return false;}}
+    }
+
+    public class NoMove : RegularMove
+    {
+        public NoMove() : base(0, 0, 0, 0) { }
+        public override void Do(Board board) {}
+        public override void Undo(Board board) {}
     }
 
     class PawnPromoution : RegularMove
@@ -85,7 +99,132 @@ namespace ChessModel
         }
     }
 
-    class Castling : RegularMove
+    class PawnLongMove : RegularMove
+    {
+        public PawnLongMove(int x1, int y1, int y2)
+            : base(x1, y1, x1, y2)
+        {
+        }
+
+        public override bool IsPawnLongMove { get { return true; } }
+    }
+
+    class TowerMove : RegularMove
+    {
+        private bool tower = false;
+
+        public TowerMove(int x1, int y1, int x2, int y2)
+            : base(x1, y1, x2, y2)
+        {
+        }
+
+        public override void Do(Board board)
+        {
+            base.Do(board);
+            if (X1 == 0)
+            {
+                if (Y1 == 0)
+                {
+                    tower = board.IsTowerA1AvailableForCastling;
+                    board.IsTowerA1AvailableForCastling = false;
+                }
+                else if (Y1 == 7)
+                {
+                    tower = board.IsTowerA8AvailableForCastling;
+                    board.IsTowerA8AvailableForCastling = false;
+                }
+            }
+            else if (X1 == 7)
+            {
+                if (Y1 == 0)
+                {
+                    tower = board.IsTowerH1AvailableForCastling;
+                    board.IsTowerH1AvailableForCastling = false;
+                }
+                else if (Y1 == 7)
+                {
+                    tower = board.IsTowerH8AvailableForCastling;
+                    board.IsTowerH8AvailableForCastling = false;
+                }
+            }
+        }
+
+        public override void Undo(Board board)
+        {
+            if (X1 == 0)
+            {
+                if (Y1 == 0)
+                {
+                    board.IsTowerA1AvailableForCastling = tower;
+                }
+                else if (Y1 == 7)
+                {
+                    board.IsTowerA8AvailableForCastling = tower;
+                }
+            }
+            else if (X1 == 7)
+            {
+                if (Y1 == 0)
+                {
+                    board.IsTowerH1AvailableForCastling = tower;
+                }
+                else if (Y1 == 7)
+                {
+                    board.IsTowerH8AvailableForCastling = tower;
+                }
+            }
+            base.Undo(board);
+        }
+    }
+
+    class KingMove : RegularMove
+    {
+        private bool towerA = false;
+        private bool towerH = false;
+
+        public KingMove(int x1, int y1, int x2, int y2)
+            : base(x1, y1, x2, y2)
+        {
+        }
+
+        public override void Do(Board board)
+        {
+            base.Do(board);
+            Man king = board.Cell(X2, Y2);
+            if (king.Color == ManColor.White)
+            {
+                towerA = board.IsTowerA1AvailableForCastling;
+                towerH = board.IsTowerH1AvailableForCastling;
+                board.IsTowerA1AvailableForCastling = false;
+                board.IsTowerH1AvailableForCastling = false;
+            }
+            else
+            {
+                towerA = board.IsTowerA8AvailableForCastling;
+                towerH = board.IsTowerH8AvailableForCastling;
+                board.IsTowerA8AvailableForCastling = false;
+                board.IsTowerH8AvailableForCastling = false;
+            }
+        }
+
+        public override void Undo(Board board)
+        {
+            Man king = board.Cell(X2, Y2);
+            if (king.Color == ManColor.White)
+            {
+                board.IsTowerA1AvailableForCastling = towerA;
+                board.IsTowerH1AvailableForCastling = towerH;
+            }
+            else
+            {
+                board.IsTowerA8AvailableForCastling = towerA;
+                board.IsTowerH8AvailableForCastling = towerH;
+            }
+            base.Undo(board);
+        }
+    }
+
+    class Castling : KingMove
     {
         private RegularMove towerMove;
 

@@ -20,8 +20,6 @@ namespace ChessModel
 
     public class Board
     {
-        List<Man> whiteMans = new List<Man>();
-        List<Man> blackMans = new List<Man>();
         BoardCell[,] cells = new BoardCell[8, 8];
 
         public Man Cell(int x, int y)
@@ -42,8 +40,6 @@ namespace ChessModel
 
         public void Clear()
         {
-            whiteMans.Clear();
-            blackMans.Clear();
             Array.Clear(cells, 0, cells.Length);
         }
 
@@ -84,15 +80,6 @@ namespace ChessModel
         {
             if (cells[x, y].man != null)
                 throw new ArgumentException("Field " + FieldName(x, y) + " already contains " + man);
-            switch (man.Color)
-            {
-                case ManColor.White:
-                    whiteMans.Add(man);
-                    break;
-                case ManColor.Black:
-                    blackMans.Add(man);
-                    break;
-            }
             cells[x, y].man = man;
         }
         private static Man CreateMan(ManColor color, ManType type)
@@ -146,77 +133,11 @@ namespace ChessModel
             Add(ManColor.Black, ManType.Rock, 7, 7);
 
             IsCheck = false;
-            IsRockA1AvailableForCastling = true;
-            IsRockH1AvailableForCastling = true;
-            IsRockA8AvailableForCastling = true;
-            IsRockH8AvailableForCastling = true;
-            LastTwoSquarepawnMoveX = -1;
-            LastTwoSquarepawnMoveY = -1;
-        }
-
-        public void Move(int x1, int y1, int x2, int y2)
-        {
-            LastTwoSquarepawnMoveX = -1;
-            LastTwoSquarepawnMoveY = -1;
-
-            var man = cells[x1, y1].man;
-            cells[x1, y1].man = null;
-            if (man.ManType == ManType.Pawn)
-            {
-                if (y2 == 0 || y2 == 7)
-                {
-                    man = new Queen(man.Color);
-                }
-                else if (Math.Abs(y1 - y2) == 2)
-                {
-                    LastTwoSquarepawnMoveX = x2;
-                    LastTwoSquarepawnMoveY = y2;
-                }
-                else if (x1 != x2 && cells[x2, y2].man == null)
-                {
-                    cells[x2, y1].man = null;
-                }
-            }
-            else if (man.ManType == ManType.King)
-            {
-                // castling
-                if (Math.Abs(x1 - x2) == 2)
-                {
-                    if (x2 < x1)
-                    {
-                        cells[3, y2].man = cells[0, y2].man;
-                        cells[0, y2].man = null;
-                    }
-                    else
-                    {
-                        cells[5, y2].man = cells[7, y2].man;
-                        cells[7, y2].man = null;
-                    }
-                }
-                if (man.Color == ManColor.White)
-                {
-                    IsRockA1AvailableForCastling = false;
-                    IsRockH1AvailableForCastling = false;
-                }
-                else if (man.Color == ManColor.Black)
-                {
-                    IsRockA8AvailableForCastling = false;
-                    IsRockH8AvailableForCastling = false;
-                }
-            }
-            if (man.ManType == ManType.Rock)
-            {
-                if (x1 == 0 && y1 == 0)
-                    IsRockA1AvailableForCastling = false;
-                else if (x1 == 7 && y1 == 0)
-                    IsRockH1AvailableForCastling = false;
-                if (x1 == 0 && y1 == 7)
-                    IsRockA8AvailableForCastling = false;
-                else if (x1 == 7 && y1 == 7)
-                    IsRockH8AvailableForCastling = false;
-            }
-            
-            cells[x2, y2].man = man;
+            IsTowerA1AvailableForCastling = true;
+            IsTowerH1AvailableForCastling = true;
+            IsTowerA8AvailableForCastling = true;
+            IsTowerH8AvailableForCastling = true;
+            LastMove = new NoMove();
         }
 
         internal bool IsEmpty(int x, int y)
@@ -248,46 +169,19 @@ namespace ChessModel
             return man == null || man.Color != color;
         }
 
-        public static bool IsCheck { get; set; }
+        public bool IsCheck { get; set; }
 
-        public static bool IsRockA1AvailableForCastling { get; set; }
+        public bool IsTowerA1AvailableForCastling { get; set; }
+        public bool IsTowerH1AvailableForCastling { get; set; }
+        public bool IsTowerA8AvailableForCastling { get; set; }
+        public bool IsTowerH8AvailableForCastling { get; set; }
 
-        public static bool IsRockH1AvailableForCastling { get; set; }
-
-        public static bool IsRockA8AvailableForCastling { get; set; }
-
-        public static bool IsRockH8AvailableForCastling { get; set; }
-
-        internal static bool IsCheckAt(ManColor Color, int p1, int p2)
+        internal bool IsCheckAt(ManColor color, int kingX, int kingY)
         {
-            return false;
-        }
-
-        public static int LastTwoSquarepawnMoveX { get; set; }
-
-        public static int LastTwoSquarepawnMoveY { get; set; }
-
-        internal bool TestForCheck(ManColor color)
-        {
-            // find king
-            int kingX, kingY;
-            for (kingY = 0; kingY < 8; ++kingY)
-            {
-                for (kingX = 0; kingX < 8; ++kingX)
-                {
-                    var king = Cell(kingX, kingY);
-                    if (king != null && king.ManType == ManType.King && king.Color == color)
-                        goto kingExists;
-                }
-            }
-            throw new InvalidOperationException("" + color + " King not found");
-
-            kingExists:
-
             ManColor alienColor = color == ManColor.White ? ManColor.Black : ManColor.White;
 
             // knight and king attack
-            for (int i=0; i<8; ++i)
+            for (int i = 0; i < 8; ++i)
             {
                 if (IsManAt(alienColor, ManType.Knight, kingX + Knight.dx[i], kingY + Knight.dy[i]))
                     return true;
@@ -304,6 +198,26 @@ namespace ChessModel
             // bishop, rock and queen
             return TestForCheckHelper(kingX, kingY, alienColor, ManType.Bishop, Bishop.dx, Bishop.dy)
                 || TestForCheckHelper(kingX, kingY, alienColor, ManType.Rock, Rock.dx, Rock.dy);
+        }
+
+        public RegularMove LastMove { get; set; }
+
+        internal bool TestForCheck(ManColor color)
+        {
+            // find king
+            int kingX, kingY;
+            for (kingY = 0; kingY < 8; ++kingY)
+            {
+                for (kingX = 0; kingX < 8; ++kingX)
+                {
+                    var king = Cell(kingX, kingY);
+                    if (king != null && king.ManType == ManType.King && king.Color == color)
+                    {
+                        return IsCheckAt(color, kingX, kingY);
+                    }
+                }
+            }
+            throw new InvalidOperationException("" + color + " King not found");
         }
 
         private bool TestForCheckHelper(int kingX, int kingY, ManColor alienColor, ManType manType, int[] dx, int[] dy)

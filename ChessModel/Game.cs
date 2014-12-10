@@ -23,33 +23,11 @@ namespace ChessModel
         private List<String> moves = new List<String>();
         public IEnumerable<String> Moves { get { return moves; } }
 
-        private List<String> availableMoves = new List<String>();
-        public IEnumerable<String> AvailableMoves { get { return availableMoves; } }
-        void CalculateTurns()
-        {
-            for (int y=0; y<8; ++y)
-            for (int x=0; x<8; ++x)
-            {
-                var man = Board.Cell(x, y);
-                if (man == null)
-                    continue;
-                if (man.Color != CurrentTurnSide)
-                {
-                    man.MoveToFields = "";
-                }
-                else
-                {
-                    StringBuilder moveToFields = new StringBuilder();
-                    foreach (var turn in man.Turns(Board, x, y))
-                    {
-                        moveToFields.Append(Board.FieldName(turn.x, turn.y));
-                    }
-                    man.MoveToFields = moveToFields.ToString();
-                }
-            }
-        }
+        private IDictionary<String, RegularMove> availableMoves = new Dictionary<String, RegularMove>();
+        public IDictionary<String, RegularMove> AvailableMoves { get { return availableMoves; } }
         void CalculateTurns2()
         {
+            availableMoves.Clear();
             for (int y = 0; y < 8; ++y)
                 for (int x = 0; x < 8; ++x)
                 {
@@ -71,6 +49,7 @@ namespace ChessModel
                                 moveToFields.Append(Board.FieldName(turn.X2, turn.Y2));
                             }
                             turn.Undo(Board);
+                            availableMoves.Add(turn.Key(), turn);
                         }
                         man.MoveToFields = moveToFields.ToString();
                     }
@@ -79,17 +58,15 @@ namespace ChessModel
 
         public void MakeMove(string move)
         {
-            int x1, x2, y1, y2;
-            ParseMove(move, out x1, out y1, out x2, out y2);
-            var man = Board.Cell(x1, y1);
-            if (man == null)
-                throw new ArgumentException("Field " + move.Substring(0, 2) + " is empty");
-            if (man.MoveToFields.IndexOf(move.Substring(3, 2)) == -1)
-                throw new ArgumentException("Not a valid move " + move);
-            Board.Move(x1, y1, x2, y2);
-            moves.Add(move);
+            var regularMove = AvailableMoves[move];
+            if (regularMove == null)
+                throw new ArgumentException("Invalid move " + move);
+
+            regularMove.Do(Board);
+            Board.LastMove = regularMove;
             ChangeSide();
             CalculateTurns2();
+            moves.Add(regularMove.ToString());
         }
 
         private void ChangeSide()
