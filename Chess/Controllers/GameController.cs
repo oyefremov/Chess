@@ -59,6 +59,29 @@ namespace Chess.Controllers
             if (game == null)
                 return Content("Game with id " + id + " not available");
 
+            if (game.CurrentTurnSide == ChessModel.ManColor.White)
+            {
+                if (User.Identity.Name != game.WhitePlayer)
+                {
+                    return Content("Only " + game.WhitePlayer + " can play for white");
+                }
+            }
+            else
+            {
+                if (game.BlackPlayer == null)
+                {
+                    if (User.Identity.Name != game.WhitePlayer)
+                    {
+                        return Content("Please, join the game before playing it.");
+                    }
+                    game.BlackPlayer = User.Identity.Name;
+                }
+                else if (User.Identity.Name != game.BlackPlayer)
+                {
+                    return Content("Only " + game.BlackPlayer + " can play for black");
+                }
+            }
+
             try {
                 game.MakeMove(move);
             }
