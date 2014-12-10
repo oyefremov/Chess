@@ -338,5 +338,15 @@ namespace ChessModel
             var man = Cell(x, y);
             return man != null && man.ManType == manType && man.Color == color;
         }
+
+        public static int GetX(ManColor color, int i)
+        {
+            return color == ManColor.White ? i : 7 - i;
+        }
+
+        public static int GetY(ManColor color, int i)
+        {
+            return color == ManColor.Black ? i : 7 - i;
+        }
     }
 }

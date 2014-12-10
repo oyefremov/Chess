@@ -3,16 +3,43 @@
 @model ChessModel.Game
 
 <table>
-    @if (User.Identity.Name != Model.BlackPlayer)
-    {
-        for (var y = 7; y >= 0; y--)
+    @{
+        var boardOrientation = User.Identity.Name != Model.BlackPlayer ? ManColor.White : ManColor.Black;
+        bool frozen;
+        if (Model.BlackPlayer == null)
         {
-            <tr class="board">
-                <td>@((char)('1' + y))</td>
-                @for (var x = 0; x < 8; x++)
+            frozen = User.Identity.Name != Model.WhitePlayer;
+        }
+        else if (Model.CurrentTurnSide == ManColor.White)
+        {
+            frozen = User.Identity.Name != Model.WhitePlayer;
+        }
+        else
+        {
+            frozen = User.Identity.Name != Model.BlackPlayer;
+        }
+      }
+    @for (var i = 0; i < 8; ++i)
+    {
+        var y = Board.GetY(boardOrientation, i);        
+        <tr class="board">
+            <td>@((char)('1' + y))</td>
+            @for (var j = 0; j < 8; ++j)
+            {
+                var x = Board.GetX(boardOrientation, j);
+                var man = Model.Board.Cell(x, y);
+                var cell = Board.FieldName(x, y);
+                if (frozen)
                 {
-                    var man = Model.Board.Cell(x, y);
-                    var cell = Board.FieldName(x, y);
+                    <td class="square">
+                        @if (man != null)
+                        {
+                            <div class="man @(man.Color)">@man.BlackCharCode</div>
+                        }
+                    </td>
+                }
+                else
+                {
                     <td class="square" id="@cell">
                         @if (man != null)
                         {
@@ -21,42 +48,15 @@
                         }
                     </td>
                 }
-            </tr>
-        }
-        <tr>
-            <td></td>
-            @for (var x = 0; x < 8; x++)
-            {
-                <td align="center">@((char)('A' + x))</td>
             }
         </tr>
     }
-    else
-    {
-        for (var y = 0; y <= 7; y++)
+    <tr>
+        <td></td>
+        @for (var j = 0; j < 8; ++j)
         {
-            <tr class="board">
-                <td>@((char)('1' + y))</td>
-                @for (var x = 7; x >= 0; x--)
-                {
-                    var man = Model.Board.Cell(x, y);
-                    var cell = Board.FieldName(x, y);
-                    <td class="square" id="@cell">
-                        @if (man != null)
-                        {
-                            string moveTo = man.MoveToFields;
-                            <div class="man @(man.Color) @(moveTo.IsEmpty() ? "" : "movable")" data-move-to="@moveTo">@man.BlackCharCode</div>
-                        }
-                    </td>
-                }
-            </tr>
+            var x = Board.GetX(boardOrientation, j);
+            <td align="center">@((char)('A' + x))</td>
         }
-        <tr>
-            <td></td>
-            @for (var x = 7; x >= 0; x--)
-            {
-                <td align="center">@((char)('A' + x))</td>
-            }
-        </tr>
-    }
+    </tr>
 </table>
