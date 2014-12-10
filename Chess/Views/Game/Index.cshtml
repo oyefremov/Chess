@@ -15,8 +15,12 @@
     @Html.Partial("game", Model)
 </div>
 
+@using (Html.BeginForm("index", "game",FormMethod.Post, new { id = "refreshForm" }))
+{
+    <input type="hidden" name="id" value="@Model.Id"/>
+}
+
 <script type="text/javascript">
-    //<![CDATA[
     $('.movable').draggable({
         containment: "table",
         revert: 'invalid'
@@ -38,5 +42,12 @@
             }
         }
     });
+
+    var myVar = setInterval(function () { refreshBoard() }, 333);
+
+    function refreshBoard() {
+        if (doRefresh)
+            document.getElementById('refreshForm').submit();
+    }
 
 </script>
