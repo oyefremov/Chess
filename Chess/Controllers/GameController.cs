@@ -89,7 +89,8 @@ namespace Chess.Controllers
             {
                 return Content("Invalid move " + move + " : " + e.Message);
             }
-            return RedirectToAction("", new { id = game.Id });
+            return PartialView("game", game);
+//            return RedirectToAction("", new { id = game.Id });
         }
     }
 }

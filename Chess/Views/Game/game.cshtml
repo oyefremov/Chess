@@ -1,45 +1,67 @@
 ﻿@model ChessModel.Game
 
-<h2>@ViewBag.Title</h2>
-<br />
+<div id="gameHolder">
+    
+    @if (Model.BlackPlayer == null)
+    {
+        <h2>@Model.WhitePlayer + 's game</h2>
+    }
+    else
+    {
+        <h2>@Model.WhitePlayer vs @Model.BlackPlayer</h2>
+    }
 
-<table>
-    <tr>
-        <td>
-            @Html.Partial("Board", Model)
-            @using (Html.BeginForm("MakeMove", "Game", FormMethod.Get))
-            {
-                <input type="hidden" name="id" value="@Model.Id" />
-                <input type="hidden" name="move" value="" />
-            }
-            @if (Model.Board.IsCheck)
-            {
-                if (Model.AvailableMoves.Count == 0)
-                {
-                    <div class="check">Checkmate</div>
-                }
-                else
-                {
-                    <div class="check">Check</div>
-                }
-            }
-            else if (Model.AvailableMoves.Count == 0)
-            {
-                <div class="check">Stalemate</div>
-            }
+    <br />
 
-        </td>
-        <td valign="top">
-            <table>
-                @foreach (var move in Model.Moves)
+    <table>
+        <tr>
+            <td>
+                @Html.Partial("Board", Model)
+                
+                @using (Ajax.BeginForm("MakeMove", null,
+                    new AjaxOptions
+                    {
+                        HttpMethod = "post",
+                        InsertionMode = InsertionMode.Replace,
+                        UpdateTargetId = "gameHolder",
+                        OnSuccess = "makeDraggable"
+                    },
+                    new { id = "makeMove" }))
+
                 {
-                    <tr>
-                        <td width="40px"></td>
-                        <td width="80px">@Html.Encode(move.Item1)</td>
-                        <td width="80px">@Html.Encode(move.Item2)</td>
-                    </tr>
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="move" value="" />
                 }
-            </table>
-        </td>
-    </tr>
-</table>
+
+                @if (Model.Board.IsCheck)
+                {
+                    if (Model.AvailableMoves.Count == 0)
+                    {
+                        <div class="check">Checkmate</div>
+                    }
+                    else
+                    {
+                        <div class="check">Check</div>
+                    }
+                }
+                else if (Model.AvailableMoves.Count == 0)
+                {
+                    <div class="check">Stalemate</div>
+                }
+
+            </td>
+            <td valign="top">
+                <table>
+                    @foreach (var move in Model.Moves)
+                    {
+                        <tr>
+                            <td width="40px"></td>
+                            <td width="80px">@Html.Encode(move.Item1)</td>
+                            <td width="80px">@Html.Encode(move.Item2)</td>
+                        </tr>
+                    }
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>

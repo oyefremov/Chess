@@ -11,38 +11,55 @@
     }
 }
 
-<div id="game">
-    @Html.Partial("game", Model)
-</div>
+@Html.Partial("game", Model)
 
-@using (Html.BeginForm("index", "game",FormMethod.Post, new { id = "refreshForm" }))
+
+@using (Html.BeginForm("index", "game",FormMethod.Post, new { id = "refreshForm2" }))
 {
     <input type="hidden" name="id" value="@Model.Id"/>
 }
 
+@using (Ajax.BeginForm("show", null,
+    new AjaxOptions
+    {
+        HttpMethod = "get",
+        InsertionMode = InsertionMode.Replace,
+        UpdateTargetId = "gameHolder",
+        OnSuccess = "makeDraggable"
+    },
+    new { id = "refreshForm" }))
+{
+    <input type="hidden" name="id" value="@Model.Id"/>
+    <input type="submit" value="reload"/>
+}
+
+@section Scripts{
 <script type="text/javascript">
-    $('.movable').draggable({
-        containment: "table",
-        revert: 'invalid'
-    });
+    function makeDraggable() {
+        $('.movable').draggable({
+            containment: "table",
+            revert: 'invalid'
+        });
 
-    $('.square').droppable({
-        drop: function (ev, ui) {
-            var dropped = ui.draggable;
-            var droppedOn = $(this);
-            
-            if ($(dropped).attr("data-move-to").indexOf(droppedOn.attr("id")) >= 0) {
+        $('.square').droppable({
+            drop: function (ev, ui) {
+                var dropped = ui.draggable;
+                var droppedOn = $(this);
 
-                var moveForm = document.forms[0];
-                moveForm.elements["move"].value = $(dropped).parent().attr("id") + "-" + droppedOn.attr("id");
-                moveForm.submit();
+                if ($(dropped).attr("data-move-to").indexOf(droppedOn.attr("id")) >= 0) {
+
+                    var moveForm = document.forms["makeMove"];
+                    moveForm.elements["move"].value = $(dropped).parent().attr("id") + "-" + droppedOn.attr("id");
+                    $(moveForm).submit();
+                }
+                else {
+                    $(dropped).css({ top: 0, left: 0 })
+                }
             }
-            else {
-                $(dropped).css({ top: 0, left: 0 })
-            }
-        }
-    });
+        });
+    }
 
+    makeDraggable();
     var myVar = setInterval(function () { refreshBoard() }, 333);
 
     function refreshBoard() {
@@ -51,3 +68,4 @@
     }
 
 </script>
+}
