@@ -12,22 +12,34 @@
                 <input type="hidden" name="id" value="@Model.Id" />
                 <input type="hidden" name="move" value="" />
             }
-        </td>
-        <td valign="top">
-            @{bool needBreak = true;}
-            @foreach (var move in Model.Moves)
+            @if (Model.Board.IsCheck)
             {
-                needBreak = !needBreak;
-                @Html.Encode(move);
-                if (needBreak)
+                if (Model.AvailableMoves.Count == 0)
                 {
-                    <br />
+                    <div class="check">Checkmate</div>
                 }
                 else
                 {
-                    @Html.Encode(" : ");
+                    <div class="check">Check</div>
                 }
             }
+            else if (Model.AvailableMoves.Count == 0)
+            {
+                <div class="check">Stalemate</div>
+            }
+
+        </td>
+        <td valign="top">
+            <table>
+                @foreach (var move in Model.Moves)
+                {
+                    <tr>
+                        <td width="40px"></td>
+                        <td width="80px">@Html.Encode(move.Item1)</td>
+                        <td width="80px">@Html.Encode(move.Item2)</td>
+                    </tr>
+                }
+            </table>
         </td>
     </tr>
 </table>

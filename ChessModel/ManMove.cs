@@ -12,7 +12,10 @@ namespace ChessModel
         public int Y1 { get; private set; }
         public int X2 { get; private set; }
         public int Y2 { get; private set; }
+        public Man MovedMan { get; private set; }
         public Man RemovedMan { get; private set; }
+        public bool Check { get; set; }
+        public bool Checkmate { get; set; }
 
         public RegularMove(int x1, int y1, int x2, int y2)
         {
@@ -24,6 +27,7 @@ namespace ChessModel
 
         public virtual void Do(Board board)
         {
+            MovedMan = board.Cell(X1, Y1);
             RemovedMan = board.Cell(X2, Y2);
             board.MoveMan(X1, Y1, X2, Y2);
         }
@@ -36,7 +40,12 @@ namespace ChessModel
 
         public override string ToString()
         {
-            return Board.FieldName(X1, Y1) + "-" + Board.FieldName(X2, Y2);
+            return MovedMan.Notation + Board.FieldName(X1, Y1) + (RemovedMan == null ? "-" : ":") + Board.FieldName(X2, Y2) + CheckNotation();
+        }
+
+        protected string CheckNotation()
+        {
+            return (Checkmate ? "#" : Check ? "+" : "");
         }
 
         internal string Key()
@@ -74,8 +83,13 @@ namespace ChessModel
 
         public override void Undo(Board board)
         {
-            base.Undo(board);
             board.SetMan(X2, Y2, pawn);
+            base.Undo(board);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + promouted.Notation;
         }
     }
 
@@ -244,6 +258,11 @@ namespace ChessModel
         {
             towerMove.Undo(board);
             base.Undo(board);
+        }
+
+        public override string ToString()
+        {
+            return X2 == 2 ? "0-0-0" : "0-0" + CheckNotation();
         }
     }
 

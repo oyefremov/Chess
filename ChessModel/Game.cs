@@ -20,14 +20,15 @@ namespace ChessModel
 
         public int Id { get; set; }
 
-        private List<String> moves = new List<String>();
-        public IEnumerable<String> Moves { get { return moves; } }
+        private List<Tuple<RegularMove, RegularMove>> moves = new List<Tuple<RegularMove, RegularMove>>();
+        public IEnumerable<Tuple<RegularMove, RegularMove>> Moves { get { return moves; } }
 
         private IDictionary<String, RegularMove> availableMoves = new Dictionary<String, RegularMove>();
         public IDictionary<String, RegularMove> AvailableMoves { get { return availableMoves; } }
         void CalculateTurns2()
         {
             availableMoves.Clear();
+            Board.IsCheck = Board.TestForCheck(CurrentTurnSide);
             for (int y = 0; y < 8; ++y)
                 for (int x = 0; x < 8; ++x)
                 {
@@ -47,9 +48,9 @@ namespace ChessModel
                             if (!Board.TestForCheck(CurrentTurnSide))
                             {
                                 moveToFields.Append(Board.FieldName(turn.X2, turn.Y2));
+                                availableMoves.Add(turn.Key(), turn);
                             }
                             turn.Undo(Board);
-                            availableMoves.Add(turn.Key(), turn);
                         }
                         man.MoveToFields = moveToFields.ToString();
                     }
@@ -66,7 +67,19 @@ namespace ChessModel
             Board.LastMove = regularMove;
             ChangeSide();
             CalculateTurns2();
-            moves.Add(regularMove.ToString());
+
+            regularMove.Check = Board.IsCheck && AvailableMoves.Count != 0;
+            regularMove.Checkmate = Board.IsCheck && AvailableMoves.Count == 0;
+
+            if (CurrentTurnSide == ManColor.Black)
+            {
+                moves.Add(Tuple.Create(regularMove, (RegularMove)null));
+            }
+            else
+            {
+                var last = moves.Count - 1;
+                moves[last] = Tuple.Create(moves[last].Item1, regularMove);
+            }
         }
 
         private void ChangeSide()

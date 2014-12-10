@@ -54,7 +54,7 @@ namespace ChessModel
             {
                 for (int x = 0; x < 8; ++x)
                 {
-                    result[(x + y * 8) * 2 + 0] = (char)('A' + x);
+                    result[(x + y * 8) * 2 + 0] = (char)('a' + x);
                     result[(x + y * 8) * 2 + 1] = (char)('1' + y);
                 }
             }

@@ -32,11 +32,20 @@
     }
 }
 <table>
+    <tr>
+        <td class="border"></td>
+        @for (var j = 0; j < 8; ++j)
+        {
+            var x = Board.GetX(boardOrientation, j);
+            <td class="border" align="center">@((char)('A' + x))</td>
+        }
+        <td class="border"></td>
+    </tr>
     @for (var i = 0; i < 8; ++i)
     {
         var y = Board.GetY(boardOrientation, i);        
         <tr class="board">
-            <td>@((char)('1' + y))</td>
+            <td class="border">@((char)('1' + y))</td>
             @for (var j = 0; j < 8; ++j)
             {
                 var x = Board.GetX(boardOrientation, j);
@@ -62,14 +71,16 @@
                     </td>
                 }
             }
+            <td class="border">@((char)('1' + y))</td>
         </tr>
     }
     <tr>
-        <td></td>
+        <td class="border"></td>
         @for (var j = 0; j < 8; ++j)
         {
             var x = Board.GetX(boardOrientation, j);
-            <td align="center">@((char)('A' + x))</td>
+            <td class="border" align="center">@((char)('A' + x))</td>
         }
+        <td class="border"></td>
     </tr>
 </table>

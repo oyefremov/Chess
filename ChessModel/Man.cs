@@ -20,6 +20,7 @@ namespace ChessModel
         public string MoveToFields { get; set; }
 
         public abstract string Name { get; }
+        public abstract string Notation { get; }
         public abstract string WhiteCharCode { get; }
         public abstract string BlackCharCode { get; }
         public abstract ManType ManType { get; }
@@ -72,6 +73,7 @@ namespace ChessModel
     {
         public Pawn(ManColor color) { Color = color; }
         public override string Name { get { return "Pawn"; } }
+        public override string Notation { get { return ""; } }
         public override string WhiteCharCode { get { return "\u2659"; } } // U+2659 White Chess Pawn (HTML &#9817;)
         public override string BlackCharCode { get { return "\u265F"; } } // U+265F Black Chess Pawn (HTML &#9823;)
         public override ManType ManType { get { return ManType.Pawn; } }
@@ -79,18 +81,32 @@ namespace ChessModel
         public override IEnumerable<RegularMove> Turns2(Board Board, int x, int y)
         {
             int dy = Color == ManColor.White ? 1 : -1;
+            var promotion = y + dy == 0 || y + dy == 7;
             if (Board.IsEmpty(x, y + dy))
             {
-                yield return new RegularMove(x, y, x, y + dy);
+                if (promotion)
+                    yield return new PawnPromoution(x, y, x, y + dy, new Queen(Color));
+                else 
+                    yield return new RegularMove(x, y, x, y + dy);
                 if (y == 1 && Color == ManColor.White && Board.IsEmpty(x, 3))
                     yield return new PawnLongMove(x, 1, 3);
                 else if (y == 6 && Color == ManColor.Black && Board.IsEmpty(x, 4))
                     yield return new PawnLongMove(x, 6, 4);
             }
             if (Board.IsColorNot(Color, x - 1, y + dy))
-                yield return new RegularMove(x, y, x - 1, y + dy);
+            {
+                if (promotion)
+                    yield return new PawnPromoution(x, y, x - 1, y + dy, new Queen(Color));
+                else
+                    yield return new RegularMove(x, y, x - 1, y + dy);
+            }
             if (Board.IsColorNot(Color, x + 1, y + dy))
-                yield return new RegularMove(x, y, x + 1, y + dy);
+            {
+                if (promotion)
+                    yield return new PawnPromoution(x, y, x + 1, y + dy, new Queen(Color));
+                else 
+                    yield return new RegularMove(x, y, x + 1, y + dy);
+            }
 
             // take on two square pawn move
             var lastMove = Board.LastMove;
@@ -107,6 +123,7 @@ namespace ChessModel
         public static int[] dy = new int[] { 0, 0, 1, -1 };
         public Rock(ManColor color) { Color = color; }
         public override string Name { get { return "Rock"; } }
+        public override string Notation { get { return "R"; } }
         public override string WhiteCharCode { get { return "\u2656"; } } // U+2656 White Chess Rook (HTML &#9814;)
         public override string BlackCharCode { get { return "\u265C"; } } // U+265C Black Chess Rook (HTML &#9820;)
         public override ManType ManType { get { return ManType.Rock; } }
@@ -119,6 +136,7 @@ namespace ChessModel
         public static int[] dy = new int[] {2, -2, 2, -2, 1, -1, 1, -1 };
         public Knight(ManColor color) { Color = color; }
         public override string Name { get { return "Knight"; } }
+        public override string Notation { get { return "N"; } }
         public override string WhiteCharCode { get { return "\u2658"; } } // U+2658 White Chess Knight (HTML &#9816;)
         public override string BlackCharCode { get { return "\u265E"; } } // U+265E Black Chess Knight (HTML &#9822;)
         public override ManType ManType { get { return ManType.Knight; } }
@@ -138,6 +156,7 @@ namespace ChessModel
         public static int[] dy = new int[] { 1, 1, -1, -1 };
         public Bishop(ManColor color) { Color = color; }
         public override string Name { get { return "Bishop"; } }
+        public override string Notation { get { return "B"; } }
         public override string WhiteCharCode { get { return "\u2657"; } } // U+2657 White Chess Bishop (HTML &#9815;)
         public override string BlackCharCode { get { return "\u265D"; } } // U+265D Black Chess Bishop (HTML &#9821;)
         public override ManType ManType { get { return ManType.Bishop; } }
@@ -148,6 +167,7 @@ namespace ChessModel
     {
         public King(ManColor color) { Color = color; }
         public override string Name { get { return "King"; } }
+        public override string Notation { get { return "K"; } }
         public override string WhiteCharCode { get { return "\u2654"; } } // U+2654 White Chess King (HTML &#9812;)
         public override string BlackCharCode { get { return "\u265A"; } } // U+265A Black Chess King (HTML &#9818;)
         public override ManType ManType { get { return ManType.King; } }
@@ -211,6 +231,7 @@ namespace ChessModel
     {
         public Queen(ManColor color) { Color = color; }
         public override string Name { get { return "Queen"; } }
+        public override string Notation { get { return "Q"; } }
         public override string WhiteCharCode { get { return "\u2655"; } } // U+2655 White Chess Queen (HTML &#9813;)
         public override string BlackCharCode { get { return "\u265B"; } } // U+265B Black Chess Queen (HTML &#9819;)
         public override ManType ManType { get { return ManType.Queen; } }
