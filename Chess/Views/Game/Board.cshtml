@@ -3,30 +3,60 @@
 @model ChessModel.Game
 
 <table>
-    @{var moves = Model.AvailableMoves;}
-    @for (var y = 7; y >= 0; y--)
-    {        
-        <tr class="board">
-            <td>@((char)('1' + y))</td>
+    @if (User.Identity.Name != Model.BlackPlayer)
+    {
+        for (var y = 7; y >= 0; y--)
+        {
+            <tr class="board">
+                <td>@((char)('1' + y))</td>
+                @for (var x = 0; x < 8; x++)
+                {
+                    var man = Model.Board.Cell(x, y);
+                    var cell = Board.FieldName(x, y);
+                    <td class="square" id="@cell">
+                        @if (man != null)
+                        {
+                            string moveTo = man.MoveToFields;
+                            <div class="man @(man.Color) @(moveTo.IsEmpty() ? "" : "movable")" data-move-to="@moveTo">@man.BlackCharCode</div>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+        <tr>
+            <td></td>
             @for (var x = 0; x < 8; x++)
             {
-                var man = Model.Board.Cell(x, y);
-                var cell = Board.FieldName(x, y);
-                <td class="square" id="@cell">
-                    @if (man != null)
-                    {
-                        string moveTo = man.MoveToFields;
-                        <div class="man @(man.Color) @(moveTo.IsEmpty() ? "" : "movable")" data-move-to="@moveTo">@man.BlackCharCode</div>
-                    }
-                </td>
+                <td align="center">@((char)('A' + x))</td>
             }
         </tr>
     }
-    <tr>
-        <td></td>
-        @for (var x = 0; x < 8; x++)
+    else
+    {
+        for (var y = 0; y <= 7; y++)
         {
-            <td align="center">@((char)('A' + x))</td>
+            <tr class="board">
+                <td>@((char)('1' + y))</td>
+                @for (var x = 7; x >= 0; x--)
+                {
+                    var man = Model.Board.Cell(x, y);
+                    var cell = Board.FieldName(x, y);
+                    <td class="square" id="@cell">
+                        @if (man != null)
+                        {
+                            string moveTo = man.MoveToFields;
+                            <div class="man @(man.Color) @(moveTo.IsEmpty() ? "" : "movable")" data-move-to="@moveTo">@man.BlackCharCode</div>
+                        }
+                    </td>
+                }
+            </tr>
         }
-    </tr>
+        <tr>
+            <td></td>
+            @for (var x = 7; x >= 0; x--)
+            {
+                <td align="center">@((char)('A' + x))</td>
+            }
+        </tr>
+    }
 </table>
