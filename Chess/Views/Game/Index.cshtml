@@ -1,44 +1,19 @@
 ﻿@model ChessModel.Game
 
 @{
-    ViewBag.Title = "Game " + Model.Id;
+    if (Model.BlackPlayer == null)
+    {
+        ViewBag.Title = Model.WhitePlayer + "'s game";
+    }
+    else
+    {
+        ViewBag.Title = Model.WhitePlayer + " vs " + Model.BlackPlayer;
+    }
 }
 
-<h2>Game @Model.Id</h2>
-<br/>
-
-<table>
-    <tr>
-        <td>
-            @Html.Partial("Board", Model)       
-            @using (Html.BeginForm("MakeMove", "Game", FormMethod.Get))
-            {
-                <input type="hidden" name="id" value="@Model.Id" />
-                <input type="hidden" name="move" value="" />
-            }
-        </td>
-        <td valign="top">
-            @{bool needBreak = true;}
-            @foreach (var move in Model.Moves)
-            {
-                needBreak = !needBreak;
-                @Html.Encode(move);
-                if (needBreak){
-                    <br/>
-                }
-                else {
-                    @Html.Encode(" : ");
-                }                                    
-            }
-        </td>
-    </tr>
-</table>
-
-
-<div></div>
-
-
-
+<div id="game">
+    @Html.Partial("game", Model)
+</div>
 
 <script type="text/javascript">
     //<![CDATA[
@@ -57,10 +32,6 @@
                 var moveForm = document.forms[0];
                 moveForm.elements["move"].value = $(dropped).parent().attr("id") + "-" + droppedOn.attr("id");
                 moveForm.submit();
-
-                //$(dropped).parent().droppable("enable");
-                //droppedOn.empty();
-                //$(dropped).detach().css({ top: 0, left: 0 }).appendTo(droppedOn);
             }
             else {
                 $(dropped).css({ top: 0, left: 0 })
@@ -68,13 +39,4 @@
         }
     });
 
-    //$(".figure")
-    //    .mousedown(function () {
-    //    $(this).addClass("active");
-    //    })
-    //    .mouseup(function () {
-    //        $(this).removeClass("active");
-    //    });
-
-    //]]>
 </script>

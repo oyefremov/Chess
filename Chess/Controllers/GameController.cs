@@ -15,8 +15,16 @@ namespace Chess.Controllers
         {
             var game = GamesManager.Instance.GetGame(id);
             if (game == null)
-                return Content("Game with id " + id +" not available");
+                return Content("Game with id " + id + " not available");
             return View(game);
+        }
+
+        public ActionResult Show(int id)
+        {
+            var game = GamesManager.Instance.GetGame(id);
+            if (game == null)
+                return Content("Game with id " + id + " not available");
+            return PartialView("game", game);
         }
 
         public ActionResult GameList()
