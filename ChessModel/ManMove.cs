@@ -58,7 +58,15 @@ namespace ChessModel
             return Board.FieldName(X1, Y1) + "-" + Board.FieldName(X2, Y2);
         }
 
-        public virtual bool IsPawnLongMove { get {return false;}}
+        public virtual bool IsPawnLongMove { get { return false; } }
+
+        public virtual string Fields 
+        { 
+            get 
+            {
+                return Board.FieldName(X1, Y1) + Board.FieldName(X2, Y2); 
+            } 
+        }
     }
 
     public class NoMove : RegularMove
@@ -66,6 +74,7 @@ namespace ChessModel
         public NoMove() : base(0, 0, 0, 0) { }
         public override void Do(Board board) {}
         public override void Undo(Board board) {}
+        public override string Fields { get { return ""; } }
     }
 
     class PawnPromoution : RegularMove
@@ -116,6 +125,8 @@ namespace ChessModel
             base.Undo(board);
             board.MoveMan(X2, Y2, X2, Y1);
         }
+
+        public override string Fields { get { return base.Fields + Board.FieldName(X2, Y2); } }
     }
 
     class PawnLongMove : RegularMove
@@ -269,6 +280,8 @@ namespace ChessModel
         {
             return X2 == 2 ? "0-0-0" : "0-0";
         }
+
+        public override string Fields { get { return base.Fields + towerMove.Fields; } }
     }
 
 }

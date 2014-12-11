@@ -30,6 +30,15 @@
 
 @section Scripts{
 <script type="text/javascript">
+
+    function hint() {
+        $('.movable').effect("highlight");
+    }
+
+    function lastMove() {
+        $('.lastmove').effect("highlight");
+    }
+
     function makeDraggable() {
         $('.movable').draggable({
             containment: "table",
@@ -52,10 +61,18 @@
         });
     }
 
+    function myOnAjaxSuccess(event, xhr, settings) {
+        if (settings.url.indexOf("Game/show") != -1) {
+            lastMove();
+        }        
+    }
+
+    $(document).ajaxSuccess(myOnAjaxSuccess);
+
     makeDraggable();
     var myVar = setInterval(function () { refreshBoard() }, 333);
     function refreshBoard() {
-        if (boardRefresh) {
+        if (boardRefresh) {            
             $('#moveControl').attr('value', currentMovesCount);
             $('#refreshForm').submit();
         }

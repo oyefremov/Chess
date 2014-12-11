@@ -28,13 +28,18 @@
             </td>
             <td valign="top">
                 <table>
-                    @foreach (var move in Model.Moves)
-                    {
-                        <tr>
-                            <td width="40px"></td>
-                            <td width="80px">@Html.Encode(move.Item1)</td>
-                            <td width="80px">@Html.Encode(move.Item2)</td>
-                        </tr>
+                    @{
+                        var lastAttr = " class=\"lastmove\" onmouseover=\"lastMove()\"";
+                        for (var i = 0; i < Model.Moves.Count(); ++i )
+                        {
+                            var move = Model.Moves[i];
+                            var last = (i == Model.Moves.Count() - 1);
+                            <tr>
+                                <td width="40px"></td>
+                                <td width="80px" @Html.Raw(last && move.Item2 == null ? lastAttr : "")>@Html.Encode(move.Item1)</td>
+                                <td width="80px" @Html.Raw(last && move.Item2 != null ? lastAttr : "")>@Html.Encode(move.Item2)</td>
+                            </tr>
+                        }
                     }
                 </table>
             </td>

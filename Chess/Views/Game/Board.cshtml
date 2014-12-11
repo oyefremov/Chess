@@ -28,38 +28,41 @@
         }
         <td class="border"></td>
     </tr>
-    @for (var i = 0; i < 8; ++i)
-    {
-        var y = Board.GetY(boardOrientation, i);        
-        <tr class="board">
-            <td class="border">@((char)('1' + y))</td>
-            @for (var j = 0; j < 8; ++j)
-            {
-                var x = Board.GetX(boardOrientation, j);
-                var man = Model.Board.Cell(x, y);
-                var cell = Board.FieldName(x, y);
-                if (frozen)
+    @{
+        var lastMoves = Model.Board.LastMove.Fields;
+        for (var i = 0; i < 8; ++i)
+        {
+            var y = Board.GetY(boardOrientation, i);        
+            <tr class="board">
+                <td class="border">@((char)('1' + y))</td>
+                @for (var j = 0; j < 8; ++j)
                 {
-                    <td class="square">
-                        @if (man != null)
-                        {
-                            <div class="man @(man.Color)">@man.BlackCharCode</div>
-                        }
-                    </td>
+                    var x = Board.GetX(boardOrientation, j);
+                    var man = Model.Board.Cell(x, y);
+                    var cell = Board.FieldName(x, y);
+                    if (frozen)
+                    {
+                        <td class="square @(lastMoves.IndexOf(cell) != -1 ? "lastmove":"")">
+                            @if (man != null)
+                            {
+                                <div class="man @(man.Color)">@man.BlackCharCode</div>
+                            }
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="square @(lastMoves.IndexOf(cell) != -1 ? "lastmove":"")" id="@cell">
+                            @if (man != null)
+                            {
+                                string moveTo = man.MoveToFields;
+                                <div class="man @(man.Color) @(moveTo.IsEmpty() ? "" : "movable")" data-move-to="@moveTo">@man.BlackCharCode</div>
+                            }
+                        </td>
+                    }
                 }
-                else
-                {
-                    <td class="square" id="@cell">
-                        @if (man != null)
-                        {
-                            string moveTo = man.MoveToFields;
-                            <div class="man @(man.Color) @(moveTo.IsEmpty() ? "" : "movable")" data-move-to="@moveTo">@man.BlackCharCode</div>
-                        }
-                    </td>
-                }
-            }
-            <td class="border">@((char)('1' + y))</td>
-        </tr>
+                <td class="border">@((char)('1' + y))</td>
+            </tr>
+        }
     }
     <tr>
         <td class="border"></td>
