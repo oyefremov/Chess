@@ -9,9 +9,8 @@
     },
     new { id = "refreshForm" }))
 {
-    <input type="text" name="id" value="@Model.Id"/>
-    <input type="text" name="sender" value="@User.Identity.Name"/>
-    <input type="text" name="move" id="moveControl" value="-5"/>
+    <input type="hidden" name="id" value="@Model.Id" />
+    <input type="hidden" name="move" id="moveControl" />
 }
 
 @using (Ajax.BeginForm("MakeMove", null,
@@ -43,7 +42,6 @@
                 var droppedOn = $(this);
 
                 if ($(dropped).attr("data-move-to").indexOf(droppedOn.attr("id")) >= 0) {
-
                     $("#userMove").attr("value", $(dropped).parent().attr("id") + "-" + droppedOn.attr("id"));
                     $("#makeMove").submit();
                 }
@@ -57,7 +55,7 @@
     makeDraggable();
     var myVar = setInterval(function () { refreshBoard() }, 333);
     function refreshBoard() {
-        if (boardRefresh && !refreshFormSubmited) {
+        if (boardRefresh) {
             $('#moveControl').attr('value', currentMovesCount);
             $('#refreshForm').submit();
         }

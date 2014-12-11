@@ -19,7 +19,7 @@ namespace Chess.Controllers
             return View(game);
         }
 
-        public ActionResult Show(int id, int move = -1, string sender="")
+        public ActionResult Show(int id, int move)
         {
             var game = GamesManager.Instance.GetGame(id);
             if (game == null)
