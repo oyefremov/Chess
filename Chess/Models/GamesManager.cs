@@ -27,7 +27,9 @@ namespace Chess.Models
 
         public Game GetGame(int id)
         {
-            return games[id];
+            Game result;
+            games.TryGetValue(id, out result);
+            return result;
         }
 
         public bool IsValidGameId(int id)

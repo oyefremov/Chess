@@ -2,36 +2,12 @@
 
 <div id="gameHolder">
     
-    @if (Model.BlackPlayer == null)
-    {
-        <h2>@Model.WhitePlayer + 's game</h2>
-    }
-    else
-    {
-        <h2>@Model.WhitePlayer vs @Model.BlackPlayer</h2>
-    }
-
+    <h2>@Model.Name</h2>
     <br />
-
     <table>
         <tr>
             <td>
                 @Html.Partial("Board", Model)
-                
-                @using (Ajax.BeginForm("MakeMove", null,
-                    new AjaxOptions
-                    {
-                        HttpMethod = "post",
-                        InsertionMode = InsertionMode.Replace,
-                        UpdateTargetId = "gameHolder",
-                        OnSuccess = "makeDraggable"
-                    },
-                    new { id = "makeMove" }))
-
-                {
-                    <input type="hidden" name="id" value="@Model.Id" />
-                    <input type="hidden" name="move" value="" />
-                }
 
                 @if (Model.Board.IsCheck)
                 {

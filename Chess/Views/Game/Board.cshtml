@@ -17,19 +17,6 @@
     {
         frozen = User.Identity.Name != Model.BlackPlayer;
     }
-
-    if (frozen)
-    {
-        <script type="text/javascript">
-            var doRefresh = true;
-        </script>
-    }
-    else
-    {
-        <script type="text/javascript">
-            var doRefresh = false;
-        </script>
-    }
 }
 <table>
     <tr>
@@ -83,4 +70,17 @@
         }
         <td class="border"></td>
     </tr>
+    @if (frozen)
+    {
+        <script type="text/javascript">
+            var doRefresh = true;
+        </script>
+    }
+    else
+    {
+        <script type="text/javascript">
+            var doRefresh = false;
+            makeDraggable();
+        </script>
+    }
 </table>

@@ -115,5 +115,34 @@ namespace ChessModel
 
         public string WhitePlayer { get; set; }
         public string BlackPlayer { get; set; }
+
+        public string Name
+        {
+            get
+            {
+                if (BlackPlayer == null)
+                {
+                    if (WhitePlayer == null)
+                    {
+                        return "Chess game";
+                    }
+                    else
+                    {
+                        return WhitePlayer + "'s game";
+                    }
+                }
+                else
+                {
+                    if (WhitePlayer == null)
+                    {
+                        return BlackPlayer + "'s game";
+                    }
+                    else
+                    {
+                        return WhitePlayer + " vs " + BlackPlayer;
+                    }
+                }
+            }
+        }
     }
 }

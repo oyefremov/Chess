@@ -1,36 +1,30 @@
 ﻿@model ChessModel.Game
 
-@{
-    if (Model.BlackPlayer == null)
-    {
-        ViewBag.Title = Model.WhitePlayer + "'s game";
-    }
-    else
-    {
-        ViewBag.Title = Model.WhitePlayer + " vs " + Model.BlackPlayer;
-    }
-}
-
 @Html.Partial("game", Model)
-
-
-@using (Html.BeginForm("index", "game",FormMethod.Post, new { id = "refreshForm2" }))
-{
-    <input type="hidden" name="id" value="@Model.Id"/>
-}
 
 @using (Ajax.BeginForm("show", null,
     new AjaxOptions
     {
         HttpMethod = "get",
         InsertionMode = InsertionMode.Replace,
-        UpdateTargetId = "gameHolder",
-        OnSuccess = "makeDraggable"
+        UpdateTargetId = "gameHolder"
     },
     new { id = "refreshForm" }))
 {
     <input type="hidden" name="id" value="@Model.Id"/>
-    <input type="submit" value="reload"/>
+}
+
+@using (Ajax.BeginForm("MakeMove", null,
+                    new AjaxOptions
+                    {
+                        HttpMethod = "post",
+                        InsertionMode = InsertionMode.Replace,
+                        UpdateTargetId = "gameHolder"                        
+                    },
+                    new { id = "makeMove" }))
+{
+    <input type="hidden" name="id" value="@Model.Id" />
+    <input type="hidden" name="move" value="" />
 }
 
 @section Scripts{
@@ -64,7 +58,7 @@
 
     function refreshBoard() {
         if (doRefresh)
-            document.getElementById('refreshForm').submit();
+            $(document.getElementById('refreshForm')).submit();
     }
 
 </script>
