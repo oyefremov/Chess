@@ -73,13 +73,14 @@
     @if (frozen)
     {
         <script type="text/javascript">
-            var doRefresh = true;
+            var boardRefresh = true;
+            var currentMovesCount = @Model.MovesCount;
         </script>
     }
     else
     {
         <script type="text/javascript">
-            var doRefresh = false;
+            var boardRefresh = false;
             makeDraggable();
         </script>
     }

@@ -1,7 +1,5 @@
 ﻿@model ChessModel.Game
 
-@Html.Partial("game", Model)
-
 @using (Ajax.BeginForm("show", null,
     new AjaxOptions
     {
@@ -11,7 +9,9 @@
     },
     new { id = "refreshForm" }))
 {
-    <input type="hidden" name="id" value="@Model.Id"/>
+    <input type="text" name="id" value="@Model.Id"/>
+    <input type="text" name="sender" value="@User.Identity.Name"/>
+    <input type="text" name="move" id="moveControl" value="-5"/>
 }
 
 @using (Ajax.BeginForm("MakeMove", null,
@@ -24,8 +24,10 @@
                     new { id = "makeMove" }))
 {
     <input type="hidden" name="id" value="@Model.Id" />
-    <input type="hidden" name="move" value="" />
+    <input type="hidden" name="move" id="userMove" value="" />
 }
+
+@Html.Partial("game", Model)
 
 @section Scripts{
 <script type="text/javascript">
@@ -42,9 +44,8 @@
 
                 if ($(dropped).attr("data-move-to").indexOf(droppedOn.attr("id")) >= 0) {
 
-                    var moveForm = document.forms["makeMove"];
-                    moveForm.elements["move"].value = $(dropped).parent().attr("id") + "-" + droppedOn.attr("id");
-                    $(moveForm).submit();
+                    $("#userMove").attr("value", $(dropped).parent().attr("id") + "-" + droppedOn.attr("id"));
+                    $("#makeMove").submit();
                 }
                 else {
                     $(dropped).css({ top: 0, left: 0 })
@@ -55,10 +56,11 @@
 
     makeDraggable();
     var myVar = setInterval(function () { refreshBoard() }, 333);
-
     function refreshBoard() {
-        if (doRefresh)
-            $(document.getElementById('refreshForm')).submit();
+        if (boardRefresh && !refreshFormSubmited) {
+            $('#moveControl').attr('value', currentMovesCount);
+            $('#refreshForm').submit();
+        }
     }
 
 </script>

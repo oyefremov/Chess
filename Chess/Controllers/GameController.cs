@@ -19,11 +19,15 @@ namespace Chess.Controllers
             return View(game);
         }
 
-        public ActionResult Show(int id)
+        public ActionResult Show(int id, int move = -1, string sender="")
         {
             var game = GamesManager.Instance.GetGame(id);
             if (game == null)
                 return Content("Game with id " + id + " not available");
+            if (game.MovesCount <= move)
+            {
+                return HttpNotFound();
+            }
             return PartialView("game", game);
         }
 

@@ -22,6 +22,7 @@ namespace ChessModel
 
         private List<Tuple<RegularMove, RegularMove>> moves = new List<Tuple<RegularMove, RegularMove>>();
         public IEnumerable<Tuple<RegularMove, RegularMove>> Moves { get { return moves; } }
+        public int MovesCount { get { return moves.Count == 0 ? 0 : moves.Count * 2 - (moves[moves.Count - 1].Item2 == null ? 1 : 0); } }
 
         private IDictionary<String, RegularMove> availableMoves = new Dictionary<String, RegularMove>();
         public IDictionary<String, RegularMove> AvailableMoves { get { return availableMoves; } }
