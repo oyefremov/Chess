@@ -40,7 +40,12 @@ namespace ChessModel
 
         public override string ToString()
         {
-            return MovedMan.Notation + Board.FieldName(X1, Y1) + (RemovedMan == null ? "-" : ":") + Board.FieldName(X2, Y2) + CheckNotation();
+            return BaseNotation() + CheckNotation();
+        }
+
+        protected virtual string BaseNotation()
+        {
+            return MovedMan.Notation + Board.FieldName(X1, Y1) + (RemovedMan == null ? "-" : ":") + Board.FieldName(X2, Y2);
         }
 
         protected string CheckNotation()
@@ -87,9 +92,9 @@ namespace ChessModel
             base.Undo(board);
         }
 
-        public override string ToString()
+        protected override string BaseNotation()
         {
-            return base.ToString() + promouted.Notation;
+            return base.BaseNotation() + promouted.Notation;
         }
     }
 
@@ -260,9 +265,9 @@ namespace ChessModel
             base.Undo(board);
         }
 
-        public override string ToString()
+        protected override string BaseNotation()
         {
-            return X2 == 2 ? "0-0-0" : "0-0" + CheckNotation();
+            return X2 == 2 ? "0-0-0" : "0-0";
         }
     }
 
