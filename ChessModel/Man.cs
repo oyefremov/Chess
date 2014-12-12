@@ -29,8 +29,8 @@ namespace ChessModel
             return "" + Color + " " + Name;
         }
 
-        public abstract IEnumerable<RegularMove> Turns2(Board Board, int x, int y);
-
+        public abstract IEnumerable<RegularMove> Turns2(Board board, int x, int y);
+        public virtual IEnumerable<RegularMove> ScanTurns(Board board, int x, int y) { return Turns2(board, x, y); }
 
         protected IEnumerable<RegularMove> TurnsHelper2(Board Board, int manX, int manY, int[] dirX, int[] dirY, ManType manType) 
         {
@@ -113,6 +113,34 @@ namespace ChessModel
             if (lastMove.IsPawnLongMove && lastMove.Y2 == y && Math.Abs(lastMove.X2 - x) == 1)
             {
                 yield return new PawnSpeciasTake(x, y, lastMove.X2, y + dy);
+            }
+        }
+
+        public override IEnumerable<RegularMove> ScanTurns(Board board, int x, int y) 
+        {
+            int dy = Color == ManColor.White ? 1 : -1;
+            if (board.IsEmpty(x, y + dy))
+            {
+                yield return new RegularMove(x, y, x, y + dy);
+                if (y == 1 && Color == ManColor.White && board.IsEmpty(x, 3))
+                    yield return new RegularMove(x, 1, x, 3);
+                else if (y == 6 && Color == ManColor.Black && board.IsEmpty(x, 4))
+                    yield return new RegularMove(x, 6, x, 4);
+            }
+            if (Board.CheckRange(x - 1))
+            {
+                yield return new RegularMove(x, y, x - 1, y + dy);
+            }
+            if (Board.CheckRange(x + 1))
+            {
+                yield return new RegularMove(x, y, x + 1, y + dy);
+            }
+
+            // take on two square pawn move
+            var lastMove = board.LastMove;
+            if (lastMove.IsPawnLongMove && lastMove.Y2 == y && Math.Abs(lastMove.X2 - x) == 1)
+            {
+                yield return new RegularMove(x, y, lastMove.X2, y + dy);
             }
         }
     }

@@ -52,20 +52,19 @@ namespace ChessModel
                     {
                         blackMans.Add(man.BlackCharCode);
                     }
+                    foreach (var turn in man.ScanTurns(Board, x, y))
+                    {
+                        Board.RemoveShadow(man.Color, turn.X2, turn.Y2);
+                    }
                     if (man.Color != CurrentTurnSide)
                     {
                         man.MoveToFields = "";
-                        foreach (var turn in man.Turns2(Board, x, y))
-                        {
-                            Board.RemoveShadow(man.Color, turn.X2, turn.Y2);
-                        }
                     }
                     else
                     {
                         StringBuilder moveToFields = new StringBuilder();
                         foreach (var turn in man.Turns2(Board, x, y))
                         {
-                            Board.RemoveShadow(man.Color, turn.X2, turn.Y2);
                             turn.Do(Board);
                             if (!Board.TestForCheck(CurrentTurnSide))
                             {
