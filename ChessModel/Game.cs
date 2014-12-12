@@ -11,6 +11,8 @@ namespace ChessModel
         public Game(bool darkChess = false)
         {
             DarkChess = darkChess;
+            WhiteWinner = false;
+            BlackWinner = false;
             Board.InitialSetup();
             CurrentTurnSide = ManColor.White;
             CalculateTurns2();
@@ -30,6 +32,14 @@ namespace ChessModel
         void CalculateTurns2()
         {
             availableMoves.Clear();
+
+            if (WhiteWinner || BlackWinner)
+            {
+                Board.IsCheck = true;
+                Board.SetVisibility(true);
+                return;
+            }
+
             Board.IsCheck = Board.TestForCheck(CurrentTurnSide);
             Board.SetVisibility(!DarkChess);
             List<String> whiteMans = new List<String>();
@@ -65,13 +75,21 @@ namespace ChessModel
                         StringBuilder moveToFields = new StringBuilder();
                         foreach (var turn in man.Turns2(Board, x, y))
                         {
-                            turn.Do(Board);
-                            if (!Board.TestForCheck(CurrentTurnSide))
+                            if (DarkChess)
                             {
                                 moveToFields.Append(Board.FieldName(turn.X2, turn.Y2));
                                 availableMoves.Add(turn.Key(), turn);
                             }
-                            turn.Undo(Board);
+                            else
+                            {
+                                turn.Do(Board);
+                                if (!Board.TestForCheck(CurrentTurnSide))
+                                {
+                                    moveToFields.Append(Board.FieldName(turn.X2, turn.Y2));
+                                    availableMoves.Add(turn.Key(), turn);
+                                }
+                                turn.Undo(Board);
+                            }
                         }
                         man.MoveToFields = moveToFields.ToString();
                     }
@@ -94,6 +112,16 @@ namespace ChessModel
             var regularMove = AvailableMoves[move];
             if (regularMove == null)
                 throw new ArgumentException("Invalid move " + move);
+
+            if (DarkChess)
+            {
+                Man man = Board.Cell(regularMove.X2, regularMove.Y2);
+                if (man != null && man.ManType == ManType.King)
+                {
+                    WhiteWinner = man.Color == ManColor.Black;
+                    BlackWinner = man.Color == ManColor.White;
+                }
+            }
 
             regularMove.Do(Board);
             Board.LastMove = regularMove;
@@ -181,5 +209,8 @@ namespace ChessModel
         public void Save()
         {
         }
+
+        bool WhiteWinner { get; set; }
+        bool BlackWinner { get; set; }
     }
 }

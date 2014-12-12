@@ -140,7 +140,7 @@ namespace ChessModel
             var lastMove = board.LastMove;
             if (lastMove.IsPawnLongMove && lastMove.Y2 == y && Math.Abs(lastMove.X2 - x) == 1)
             {
-                yield return new RegularMove(x, y, lastMove.X2, y + dy);
+                yield return new RegularMove(x, y, lastMove.X2, y);
             }
         }
     }
