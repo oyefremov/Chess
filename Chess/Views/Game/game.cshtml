@@ -1,4 +1,5 @@
-﻿@model ChessModel.Game
+﻿@using ChessModel
+@model ChessModel.Game
 
 <div id="gameHolder">
     
@@ -25,6 +26,18 @@
                     <div class="check">Stalemate</div>
                 }
 
+                @{
+                    var boardOrientation = User.Identity.Name == Model.WhitePlayer || User.Identity.Name != Model.BlackPlayer ? ManColor.White : ManColor.Black;
+                    if (Model.BlackPlayer != null && Model.BlackPlayer != Model.WhitePlayer)
+                    {
+                        if (Model.CurrentTurnSide == ManColor.White && User.Identity.Name == Model.WhitePlayer ||
+                            Model.CurrentTurnSide == ManColor.Black && User.Identity.Name == Model.BlackPlayer)
+                        {
+                            <div>Your turn</div>
+                        }
+                    }
+                }
+
             </td>
             <td valign="top">
                 <table>
@@ -36,8 +49,26 @@
                             var last = (i == Model.Moves.Count() - 1);
                             <tr>
                                 <td width="40px"></td>
-                                <td width="80px" @Html.Raw(last && move.Item2 == null ? lastAttr : "")>@Html.Encode(move.Item1)</td>
-                                <td width="80px" @Html.Raw(last && move.Item2 != null ? lastAttr : "")>@Html.Encode(move.Item2)</td>
+                                <td width="80px" @Html.Raw(last && move.Item2 == null ? lastAttr : "")>
+                                    @if (Model.DarkChess && User.Identity.Name != Model.WhitePlayer)
+                                    {
+                                        <div>??-??</div>
+                                    }
+                                    else
+                                    {
+                                        <div>@move.Item1</div>
+                                    }
+                                </td>
+                                <td width="80px" @Html.Raw(last && move.Item2 != null ? lastAttr : "")>
+                                    @if (Model.DarkChess && User.Identity.Name != Model.BlackPlayer && move.Item2 != null)
+                                    {
+                                        <div>??-??</div>
+                                    }
+                                    else
+                                    {
+                                        <div>@move.Item2</div>
+                                    }
+                                </td>
                             </tr>
                         }
                     }

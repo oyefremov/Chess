@@ -8,8 +8,9 @@ namespace ChessModel
 {
     public class Game
     {
-        public Game()
+        public Game(bool darkChess = false)
         {
+            DarkChess = darkChess;
             Board.InitialSetup();
             CurrentTurnSide = ManColor.White;
             CalculateTurns2();
@@ -30,21 +31,31 @@ namespace ChessModel
         {
             availableMoves.Clear();
             Board.IsCheck = Board.TestForCheck(CurrentTurnSide);
+            Board.SetVisibility(!DarkChess);
             for (int y = 0; y < 8; ++y)
                 for (int x = 0; x < 8; ++x)
                 {
                     var man = Board.Cell(x, y);
                     if (man == null)
                         continue;
+                    if (DarkChess)
+                    {
+                        Board.RemoveShadow(man.Color, x, y);
+                    }
                     if (man.Color != CurrentTurnSide)
                     {
                         man.MoveToFields = "";
+                        foreach (var turn in man.Turns2(Board, x, y))
+                        {
+                            Board.RemoveShadow(man.Color, turn.X2, turn.Y2);
+                        }
                     }
                     else
                     {
                         StringBuilder moveToFields = new StringBuilder();
                         foreach (var turn in man.Turns2(Board, x, y))
                         {
+                            Board.RemoveShadow(man.Color, turn.X2, turn.Y2);
                             turn.Do(Board);
                             if (!Board.TestForCheck(CurrentTurnSide))
                             {
@@ -116,6 +127,7 @@ namespace ChessModel
 
         public string WhitePlayer { get; set; }
         public string BlackPlayer { get; set; }
+        public bool DarkChess { get; set; }
 
         public string Name
         {
@@ -144,6 +156,10 @@ namespace ChessModel
                     }
                 }
             }
+        }
+
+        public void Save()
+        {
         }
     }
 }

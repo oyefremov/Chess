@@ -40,7 +40,17 @@ namespace Chess.Controllers
         {
             if (!User.Identity.IsAuthenticated)
                 return Content("User must be authenticated");
-            var game = GamesManager.Instance.CreateGame();
+            var game = GamesManager.Instance.CreateGame(false);
+            game.WhitePlayer = User.Identity.Name;
+            return RedirectToAction("", new { id = game.Id });
+        }
+
+        public ActionResult NewDarkChessGame()
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Content("User must be authenticated");
+            var game = GamesManager.Instance.CreateGame(true);
+            game.DarkChess = true;
             game.WhitePlayer = User.Identity.Name;
             return RedirectToAction("", new { id = game.Id });
         }

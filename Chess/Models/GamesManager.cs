@@ -13,12 +13,12 @@ namespace Chess.Models
 
         IDictionary<int, Game> games = new Dictionary<int,Game>();
 
-        public Game CreateGame()
+        public Game CreateGame(bool darkChess = false)
         {
             lock (games)
             {
                 var id = games.Count + 1;
-                Game game = new Game();
+                Game game = new Game(darkChess);
                 game.Id = id;
                 games.Add(id, game);
                 return game;

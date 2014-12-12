@@ -1,4 +1,5 @@
 ﻿<!-- ko with: home -->
-@Html.ActionLink("New Game", "NewGame", "Game")
+@Html.ActionLink("New Game", "NewGame", "Game")<br/>
+@Html.ActionLink("New Dark Chess", "NewDarkChessGame", "Game")
 @Html.Partial("GameList", Chess.Models.GamesManager.Instance.GetGames())
 <!-- /ko -->

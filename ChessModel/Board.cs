@@ -10,6 +10,8 @@ namespace ChessModel
     public struct BoardCell
     {
         public Man man;
+        public bool WhiteVisible;
+        public bool BlackVisible;
     }
 
     public struct BoardCellPos
@@ -261,6 +263,41 @@ namespace ChessModel
         public static int GetY(ManColor color, int i)
         {
             return color == ManColor.Black ? i : 7 - i;
+        }
+
+        internal void SetVisibility(bool visible)
+        {
+            for (int y = 0; y < 8; ++y)
+                for (int x = 0; x < 8; ++x)
+                {
+                    cells[x, y].BlackVisible = visible;
+                    cells[x, y].WhiteVisible = visible;
+                }
+        }
+
+        internal void RemoveShadow(ManColor color, int x, int y)
+        {
+            if (color == ManColor.White)
+            {
+                cells[x, y].WhiteVisible = true;
+            }
+            else if (color == ManColor.Black)
+            {
+                cells[x, y].BlackVisible = true;
+            }
+        }
+
+        public bool IsVisible(ManColor color, int x, int y)
+        {
+            if (color == ManColor.White)
+            {
+                return cells[x, y].WhiteVisible;
+            }
+            else if (color == ManColor.Black)
+            {
+                return cells[x, y].BlackVisible;
+            }
+            return false;
         }
     }
 }

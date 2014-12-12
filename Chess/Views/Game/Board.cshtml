@@ -17,6 +17,8 @@
     {
         frozen = User.Identity.Name != Model.BlackPlayer;
     }
+    bool showWhite = User.Identity.Name == Model.WhitePlayer;
+    bool showBlack = User.Identity.Name == Model.BlackPlayer;
 }
 <table>
     <tr>
@@ -40,7 +42,16 @@
                     var x = Board.GetX(boardOrientation, j);
                     var man = Model.Board.Cell(x, y);
                     var cell = Board.FieldName(x, y);
-                    if (frozen)
+                    bool visible =
+                        showWhite && Model.Board.IsVisible(ManColor.White, x, y) ||
+                        showBlack && Model.Board.IsVisible(ManColor.Black, x, y);
+                    if (!visible)
+                    {
+                        <td class="square">
+                            <div class="man">#</div>
+                        </td>
+                    }
+                    else if (frozen)
                     {
                         <td class="square @(lastMoves.IndexOf(cell) != -1 ? "lastmove":"")">
                             @if (man != null)
@@ -81,7 +92,7 @@
         </script>
     }
     else
-    {
+    {        
         <script type="text/javascript">
             var boardRefresh = false;
             makeDraggable();
