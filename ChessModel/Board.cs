@@ -70,6 +70,9 @@ namespace ChessModel
             return new String(fieldNames, (x + y * 8) * 2, 2);
         }
 
+        public String WhiteMans { get; set; }
+        public String BlackMans { get; set; }
+
         public ManColor FieldColorCode(int x, int y)
         {
             if (((x + y) & 1) == 0)
@@ -187,7 +190,7 @@ namespace ChessModel
             {
                 if (IsManAt(alienColor, ManType.Knight, kingX + Knight.dx[i], kingY + Knight.dy[i]))
                     return true;
-                if (IsManAt(alienColor, ManType.King, kingX + Man.allDx[i], kingY + Man.allDx[i]))
+                if (IsManAt(alienColor, ManType.King, kingX + Man.allDx[i], kingY + Man.allDy[i]))
                     return true;
             }
 

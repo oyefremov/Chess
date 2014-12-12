@@ -32,6 +32,8 @@ namespace ChessModel
             availableMoves.Clear();
             Board.IsCheck = Board.TestForCheck(CurrentTurnSide);
             Board.SetVisibility(!DarkChess);
+            List<String> whiteMans = new List<String>();
+            List<String> blackMans = new List<String>();
             for (int y = 0; y < 8; ++y)
                 for (int x = 0; x < 8; ++x)
                 {
@@ -41,6 +43,14 @@ namespace ChessModel
                     if (DarkChess)
                     {
                         Board.RemoveShadow(man.Color, x, y);
+                    }
+                    if (man.Color == ManColor.White)
+                    {
+                        whiteMans.Add(man.WhiteCharCode);
+                    }
+                    else
+                    {
+                        blackMans.Add(man.BlackCharCode);
                     }
                     if (man.Color != CurrentTurnSide)
                     {
@@ -67,6 +77,17 @@ namespace ChessModel
                         man.MoveToFields = moveToFields.ToString();
                     }
                 }
+            whiteMans.Sort();
+            blackMans.Sort();
+            StringBuilder list = new StringBuilder();
+            foreach (var man in whiteMans)
+                list.Append(man);
+            Board.WhiteMans = list.ToString();
+
+            list.Clear();
+            foreach (var man in blackMans)
+                list.Append(man);
+            Board.BlackMans = list.ToString();
         }
 
         public void MakeMove(string move)

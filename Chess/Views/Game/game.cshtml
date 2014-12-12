@@ -27,6 +27,18 @@
                 }
 
                 @{
+                    if (Model.DarkChess)
+                    {
+                        if (User.Identity.Name == Model.WhitePlayer)
+                        {
+                            <div>@Model.Board.BlackMans</div>
+                        }
+                        else if (User.Identity.Name == Model.BlackPlayer)
+                        {
+                            <div>@Model.Board.WhiteMans</div>
+                        }
+                    }
+                    
                     var boardOrientation = User.Identity.Name == Model.WhitePlayer || User.Identity.Name != Model.BlackPlayer ? ManColor.White : ManColor.Black;
                     if (Model.BlackPlayer != null && Model.BlackPlayer != Model.WhitePlayer)
                     {
