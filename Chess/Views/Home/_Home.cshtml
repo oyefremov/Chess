@@ -1,5 +1,10 @@
 ﻿<!-- ko with: home -->
-@Html.ActionLink("New Game", "NewGame", "Game")<br/>
-@Html.ActionLink("New Dark Chess", "NewDarkChessGame", "Game")
+@Html.ActionLink("New Solo Game", "NewSoloGame", "Game")<br />
+@Html.ActionLink("New Regular Game", "NewGame", "Game")<br />
+@Html.ActionLink("New Dark Chess", "NewDarkChessGame", "Game")<br />
+@Html.ActionLink("New Dark Chess (check)", "NewDarkChessCheckGame", "Game")<br />
+@Html.ActionLink("New Dark Chess (checkmate)", "NewDarkChessCheckmateGame", "Game")<br/>
+
+<p/>
 @Html.Partial("GameList", Chess.Models.GamesManager.Instance.GetGames())
 <!-- /ko -->

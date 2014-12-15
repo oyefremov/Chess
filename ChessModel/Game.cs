@@ -8,14 +8,22 @@ namespace ChessModel
 {
     public class Game
     {
-        public Game(bool darkChess = false)
+        public static Game CreateRegularGame() { return new Game(false, true, true); }
+        public static Game CreateDarkGame() { return new Game(true, false, false); }
+        public static Game CreateDarkCheckGame() { return new Game(true, true, false); }
+        public static Game CreateDarkCheckmateGame() { return new Game(true, true, true); }
+
+        public Game(bool darkChess, bool check, bool checkmate)
         {
+            UseTimer = false;
             DarkChess = darkChess;
+            Board.CheckRule = check;
+            Board.CheckmateRule = checkmate;
             WhiteWinner = false;
             BlackWinner = false;
             Board.InitialSetup();
-            CurrentTurnSide = ManColor.White;
-            CalculateTurns2();
+            CurrentSide = ManColor.White;
+            CalculateMoves();
         }
 
         private Board board = new Board();
@@ -29,7 +37,7 @@ namespace ChessModel
 
         private IDictionary<String, RegularMove> availableMoves = new Dictionary<String, RegularMove>();
         public IDictionary<String, RegularMove> AvailableMoves { get { return availableMoves; } }
-        void CalculateTurns2()
+        void CalculateMoves()
         {
             availableMoves.Clear();
 
@@ -40,7 +48,7 @@ namespace ChessModel
                 return;
             }
 
-            Board.IsCheck = Board.TestForCheck(CurrentTurnSide);
+            Board.IsCheck = Board.TestForCheck(CurrentSide);
             Board.SetVisibility(!DarkChess);
             List<String> whiteMans = new List<String>();
             List<String> blackMans = new List<String>();
@@ -62,33 +70,33 @@ namespace ChessModel
                     {
                         blackMans.Add(man.BlackCharCode);
                     }
-                    foreach (var turn in man.ScanTurns(Board, x, y))
+                    foreach (var move in man.ScanMoves(Board, x, y))
                     {
-                        Board.RemoveShadow(man.Color, turn.X2, turn.Y2);
+                        Board.RemoveShadow(man.Color, move.X2, move.Y2);
                     }
-                    if (man.Color != CurrentTurnSide)
+                    if (man.Color != CurrentSide)
                     {
                         man.MoveToFields = "";
                     }
                     else
                     {
                         StringBuilder moveToFields = new StringBuilder();
-                        foreach (var turn in man.Turns2(Board, x, y))
+                        foreach (var move in man.Moves(Board, x, y))
                         {
-                            if (DarkChess)
+                            if (Board.CheckmateRule)
                             {
-                                moveToFields.Append(Board.FieldName(turn.X2, turn.Y2));
-                                availableMoves.Add(turn.Key(), turn);
+                                move.Do(Board);
+                                if (!Board.TestForCheck(CurrentSide))
+                                {
+                                    moveToFields.Append(Board.FieldName(move.X2, move.Y2));
+                                    availableMoves.Add(move.Key(), move);
+                                }
+                                move.Undo(Board);
                             }
                             else
                             {
-                                turn.Do(Board);
-                                if (!Board.TestForCheck(CurrentTurnSide))
-                                {
-                                    moveToFields.Append(Board.FieldName(turn.X2, turn.Y2));
-                                    availableMoves.Add(turn.Key(), turn);
-                                }
-                                turn.Undo(Board);
+                                moveToFields.Append(Board.FieldName(move.X2, move.Y2));
+                                availableMoves.Add(move.Key(), move);
                             }
                         }
                         man.MoveToFields = moveToFields.ToString();
@@ -126,12 +134,12 @@ namespace ChessModel
             regularMove.Do(Board);
             Board.LastMove = regularMove;
             ChangeSide();
-            CalculateTurns2();
+            CalculateMoves();
 
             regularMove.Check = Board.IsCheck && AvailableMoves.Count != 0;
             regularMove.Checkmate = Board.IsCheck && AvailableMoves.Count == 0;
 
-            if (CurrentTurnSide == ManColor.Black)
+            if (CurrentSide == ManColor.Black)
             {
                 moves.Add(Tuple.Create(regularMove, (RegularMove)null));
             }
@@ -144,7 +152,7 @@ namespace ChessModel
 
         private void ChangeSide()
         {
-            CurrentTurnSide = CurrentTurnSide == ManColor.White ? ManColor.Black : ManColor.White;
+            CurrentSide = CurrentSide == ManColor.White ? ManColor.Black : ManColor.White;
         }
 
         private void ParseMove(string move, out int x1, out int y1, out int x2, out int y2)
@@ -171,7 +179,7 @@ namespace ChessModel
             return p - '1';
         }
 
-        public ManColor CurrentTurnSide { get; set; }
+        public ManColor CurrentSide { get; set; }
 
         public string WhitePlayer { get; set; }
         public string BlackPlayer { get; set; }
@@ -181,26 +189,31 @@ namespace ChessModel
         {
             get
             {
+                string name = DarkChess ? "Dark" : "Classic";
+                if (DarkChess && Board.CheckmateRule)
+                    name += " (checkmate)";
+                else if (DarkChess && Board.CheckRule)
+                    name += " (check)";
                 if (BlackPlayer == null)
                 {
                     if (WhitePlayer == null)
                     {
-                        return "Chess game";
+                        return name;
                     }
                     else
                     {
-                        return WhitePlayer + "'s game";
+                        return WhitePlayer + "'s " + name + "game";
                     }
                 }
                 else
                 {
                     if (WhitePlayer == null)
                     {
-                        return BlackPlayer + "'s game";
+                        return BlackPlayer + "'s " + name + "game";
                     }
                     else
                     {
-                        return WhitePlayer + " vs " + BlackPlayer;
+                        return WhitePlayer + " vs " + BlackPlayer + " " + name;
                     }
                 }
             }
@@ -212,5 +225,11 @@ namespace ChessModel
 
         bool WhiteWinner { get; set; }
         bool BlackWinner { get; set; }
+
+        public bool UseTimer { get; set; }
+        public int BaseTimer { get; set; }
+        public int TurnTimer { get; set; }
+        public int WhitePlayerTimer { get; set; }
+        public int BlackPlayerTimer { get; set; }
     }
 }

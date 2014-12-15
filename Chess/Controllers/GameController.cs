@@ -36,23 +36,40 @@ namespace Chess.Controllers
             return PartialView("games", GamesManager.Instance.GetGames());
         }
 
-        public ActionResult NewGame()
+        private ActionResult NewGameImpl(bool darkChessRule = false, bool solo = false, bool checkRule = true, bool checkmateRule = true)
         {
             if (!User.Identity.IsAuthenticated)
                 return Content("User must be authenticated");
-            var game = GamesManager.Instance.CreateGame(false);
+            var game = GamesManager.Instance.CreateGame(darkChessRule, checkRule, checkmateRule);
             game.WhitePlayer = User.Identity.Name;
+            if (solo)
+                game.BlackPlayer = game.WhitePlayer;
             return RedirectToAction("", new { id = game.Id });
+        }
+
+        public ActionResult NewSoloGame()
+        {
+            return NewGameImpl(solo: true);
+        }
+
+        public ActionResult NewGame()
+        {
+            return NewGameImpl();
         }
 
         public ActionResult NewDarkChessGame()
         {
-            if (!User.Identity.IsAuthenticated)
-                return Content("User must be authenticated");
-            var game = GamesManager.Instance.CreateGame(true);
-            game.DarkChess = true;
-            game.WhitePlayer = User.Identity.Name;
-            return RedirectToAction("", new { id = game.Id });
+            return NewGameImpl(darkChessRule: true, checkRule: false, checkmateRule: false);
+        }
+
+        public ActionResult NewDarkChessCheckGame()
+        {
+            return NewGameImpl(darkChessRule: true, checkRule: true, checkmateRule: false);
+        }
+
+        public ActionResult NewDarkChessCheckmateGame()
+        {
+            return NewGameImpl(darkChessRule: true, checkRule: true, checkmateRule: true);
         }
 
         public ActionResult Join(int id)
@@ -73,7 +90,7 @@ namespace Chess.Controllers
             if (game == null)
                 return Content("Game with id " + id + " not available");
 
-            if (game.CurrentTurnSide == ChessModel.ManColor.White)
+            if (game.CurrentSide == ChessModel.ManColor.White)
             {
                 if (User.Identity.Name != game.WhitePlayer)
                 {

@@ -5,7 +5,7 @@
 @{
     var boardOrientation = User.Identity.Name == Model.WhitePlayer || User.Identity.Name != Model.BlackPlayer ? ManColor.White : ManColor.Black;
     bool frozen;
-    if (Model.CurrentTurnSide == ManColor.White)
+    if (Model.CurrentSide == ManColor.White)
     {
         frozen = User.Identity.Name != Model.WhitePlayer;
     }

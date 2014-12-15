@@ -42,10 +42,10 @@
                     var boardOrientation = User.Identity.Name == Model.WhitePlayer || User.Identity.Name != Model.BlackPlayer ? ManColor.White : ManColor.Black;
                     if (Model.BlackPlayer != null && Model.BlackPlayer != Model.WhitePlayer)
                     {
-                        if (Model.CurrentTurnSide == ManColor.White && User.Identity.Name == Model.WhitePlayer ||
-                            Model.CurrentTurnSide == ManColor.Black && User.Identity.Name == Model.BlackPlayer)
+                        if (Model.CurrentSide == ManColor.White && User.Identity.Name == Model.WhitePlayer ||
+                            Model.CurrentSide == ManColor.Black && User.Identity.Name == Model.BlackPlayer)
                         {
-                            <div>Your turn</div>
+                            <div>Your move</div>
                         }
                     }
                 }

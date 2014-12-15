@@ -16,6 +16,7 @@ namespace ChessModel
         public Man RemovedMan { get; private set; }
         public bool Check { get; set; }
         public bool Checkmate { get; set; }
+        public bool FirstMove { get; set; }
 
         public RegularMove(int x1, int y1, int x2, int y2)
         {
@@ -28,12 +29,15 @@ namespace ChessModel
         public virtual void Do(Board board)
         {
             MovedMan = board.Cell(X1, Y1);
+            FirstMove = !MovedMan.Moved;
+            MovedMan.Moved = true;
             RemovedMan = board.Cell(X2, Y2);
             board.MoveMan(X1, Y1, X2, Y2);
         }
 
         public virtual void Undo(Board board)
         {
+            MovedMan.Moved = !FirstMove;
             board.MoveMan(X2, Y2, X1, Y1);
             board.SetMan(X2, Y2, RemovedMan);
         }
@@ -139,140 +143,25 @@ namespace ChessModel
         public override bool IsPawnLongMove { get { return true; } }
     }
 
-    class TowerMove : RegularMove
+    class Castling : RegularMove
     {
-        private bool tower = false;
-
-        public TowerMove(int x1, int y1, int x2, int y2)
-            : base(x1, y1, x2, y2)
-        {
-        }
-
-        public override void Do(Board board)
-        {
-            base.Do(board);
-            if (X1 == 0)
-            {
-                if (Y1 == 0)
-                {
-                    tower = board.IsTowerA1AvailableForCastling;
-                    board.IsTowerA1AvailableForCastling = false;
-                }
-                else if (Y1 == 7)
-                {
-                    tower = board.IsTowerA8AvailableForCastling;
-                    board.IsTowerA8AvailableForCastling = false;
-                }
-            }
-            else if (X1 == 7)
-            {
-                if (Y1 == 0)
-                {
-                    tower = board.IsTowerH1AvailableForCastling;
-                    board.IsTowerH1AvailableForCastling = false;
-                }
-                else if (Y1 == 7)
-                {
-                    tower = board.IsTowerH8AvailableForCastling;
-                    board.IsTowerH8AvailableForCastling = false;
-                }
-            }
-        }
-
-        public override void Undo(Board board)
-        {
-            if (X1 == 0)
-            {
-                if (Y1 == 0)
-                {
-                    board.IsTowerA1AvailableForCastling = tower;
-                }
-                else if (Y1 == 7)
-                {
-                    board.IsTowerA8AvailableForCastling = tower;
-                }
-            }
-            else if (X1 == 7)
-            {
-                if (Y1 == 0)
-                {
-                    board.IsTowerH1AvailableForCastling = tower;
-                }
-                else if (Y1 == 7)
-                {
-                    board.IsTowerH8AvailableForCastling = tower;
-                }
-            }
-            base.Undo(board);
-        }
-    }
-
-    class KingMove : RegularMove
-    {
-        private bool towerA = false;
-        private bool towerH = false;
-
-        public KingMove(int x1, int y1, int x2, int y2)
-            : base(x1, y1, x2, y2)
-        {
-        }
-
-        public override void Do(Board board)
-        {
-            base.Do(board);
-            Man king = board.Cell(X2, Y2);
-            if (king.Color == ManColor.White)
-            {
-                towerA = board.IsTowerA1AvailableForCastling;
-                towerH = board.IsTowerH1AvailableForCastling;
-                board.IsTowerA1AvailableForCastling = false;
-                board.IsTowerH1AvailableForCastling = false;
-            }
-            else
-            {
-                towerA = board.IsTowerA8AvailableForCastling;
-                towerH = board.IsTowerH8AvailableForCastling;
-                board.IsTowerA8AvailableForCastling = false;
-                board.IsTowerH8AvailableForCastling = false;
-            }
-        }
-
-        public override void Undo(Board board)
-        {
-            Man king = board.Cell(X2, Y2);
-            if (king.Color == ManColor.White)
-            {
-                board.IsTowerA1AvailableForCastling = towerA;
-                board.IsTowerH1AvailableForCastling = towerH;
-            }
-            else
-            {
-                board.IsTowerA8AvailableForCastling = towerA;
-                board.IsTowerH8AvailableForCastling = towerH;
-            }
-            base.Undo(board);
-        }
-    }
-
-    class Castling : KingMove
-    {
-        private RegularMove towerMove;
+        private RegularMove rockMove;
 
         public Castling(int x, int y)
             : base(4, y, x == 0 ? 2 : 6, y)
         {
-            towerMove = new RegularMove(x, y, x == 0 ? 3 : 5, y);
+            rockMove = new RegularMove(x, y, x == 0 ? 3 : 5, y);
         }
 
         public override void Do(Board board)
         {
             base.Do(board);
-            towerMove.Do(board);
+            rockMove.Do(board);
         }
 
         public override void Undo(Board board)
         {
-            towerMove.Undo(board);
+            rockMove.Undo(board);
             base.Undo(board);
         }
 
@@ -281,7 +170,7 @@ namespace ChessModel
             return X2 == 2 ? "0-0-0" : "0-0";
         }
 
-        public override string Fields { get { return base.Fields + towerMove.Fields; } }
+        public override string Fields { get { return base.Fields + rockMove.Fields; } }
     }
 
 }

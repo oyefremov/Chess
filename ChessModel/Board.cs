@@ -23,6 +23,8 @@ namespace ChessModel
     public class Board
     {
         BoardCell[,] cells = new BoardCell[8, 8];
+        public bool CheckRule { get; set; }
+        public bool CheckmateRule { get; set; }
 
         public Man Cell(int x, int y)
         {
@@ -138,10 +140,6 @@ namespace ChessModel
             Add(ManColor.Black, ManType.Rock, 7, 7);
 
             IsCheck = false;
-            IsTowerA1AvailableForCastling = true;
-            IsTowerH1AvailableForCastling = true;
-            IsTowerA8AvailableForCastling = true;
-            IsTowerH8AvailableForCastling = true;
             LastMove = new NoMove();
         }
 
@@ -175,11 +173,6 @@ namespace ChessModel
         }
 
         public bool IsCheck { get; set; }
-
-        public bool IsTowerA1AvailableForCastling { get; set; }
-        public bool IsTowerH1AvailableForCastling { get; set; }
-        public bool IsTowerA8AvailableForCastling { get; set; }
-        public bool IsTowerH8AvailableForCastling { get; set; }
 
         internal bool IsCheckAt(ManColor color, int kingX, int kingY)
         {

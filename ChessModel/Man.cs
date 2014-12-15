@@ -14,6 +14,11 @@ namespace ChessModel
 
     public abstract class Man
     {
+        protected Man()
+        {
+            Moved = false;
+        }
+
         public ManColor Color {get; set;}
         public int X { get; set; }
         public int Y { get; set; }
@@ -23,16 +28,17 @@ namespace ChessModel
         public abstract string Notation { get; }
         public abstract string WhiteCharCode { get; }
         public abstract string BlackCharCode { get; }
+        public bool Moved { get; set; }
         public abstract ManType ManType { get; }
         override public String ToString()
         {
             return "" + Color + " " + Name;
         }
 
-        public abstract IEnumerable<RegularMove> Turns2(Board board, int x, int y);
-        public virtual IEnumerable<RegularMove> ScanTurns(Board board, int x, int y) { return Turns2(board, x, y); }
+        public abstract IEnumerable<RegularMove> Moves(Board board, int x, int y);
+        public virtual IEnumerable<RegularMove> ScanMoves(Board board, int x, int y) { return Moves(board, x, y); }
 
-        protected IEnumerable<RegularMove> TurnsHelper2(Board Board, int manX, int manY, int[] dirX, int[] dirY, ManType manType) 
+        protected IEnumerable<RegularMove> TurnsHelper2(Board Board, int manX, int manY, int[] dirX, int[] dirY) 
         {
             if (dirX.Length != dirY.Length)
                 throw new ArgumentException("dirX.Length != dirY.Length");
@@ -48,18 +54,12 @@ namespace ChessModel
                     y += dy;
                     if (Board.IsEmpty(x, y))
                     {
-                        if (manType == ManType.Rock)
-                            yield return new TowerMove(manX, manY, x, y);
-                        else 
-                            yield return new RegularMove(manX, manY, x, y);
+                        yield return new RegularMove(manX, manY, x, y);
                         continue;
                     }
                     if (Board.IsColorNot(Color, x, y))
                     {
-                        if (manType == ManType.Rock)
-                            yield return new TowerMove(manX, manY, x, y);
-                        else
-                            yield return new RegularMove(manX, manY, x, y);
+                        yield return new RegularMove(manX, manY, x, y);
                     }
                     break;
                 }
@@ -78,7 +78,7 @@ namespace ChessModel
         public override string BlackCharCode { get { return "\u265F"; } } // U+265F Black Chess Pawn (HTML &#9823;)
         public override ManType ManType { get { return ManType.Pawn; } }
 
-        public override IEnumerable<RegularMove> Turns2(Board Board, int x, int y)
+        public override IEnumerable<RegularMove> Moves(Board Board, int x, int y)
         {
             int dy = Color == ManColor.White ? 1 : -1;
             var promotion = y + dy == 0 || y + dy == 7;
@@ -116,7 +116,7 @@ namespace ChessModel
             }
         }
 
-        public override IEnumerable<RegularMove> ScanTurns(Board board, int x, int y) 
+        public override IEnumerable<RegularMove> ScanMoves(Board board, int x, int y) 
         {
             int dy = Color == ManColor.White ? 1 : -1;
             if (board.IsEmpty(x, y + dy))
@@ -155,7 +155,7 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2656"; } } // U+2656 White Chess Rook (HTML &#9814;)
         public override string BlackCharCode { get { return "\u265C"; } } // U+265C Black Chess Rook (HTML &#9820;)
         public override ManType ManType { get { return ManType.Rock; } }
-        public override IEnumerable<RegularMove> Turns2(Board board, int x, int y) { return TurnsHelper2(board, x, y, dx, dy, ManType); }
+        public override IEnumerable<RegularMove> Moves(Board board, int x, int y) { return TurnsHelper2(board, x, y, dx, dy); }
     }
 
     public class Knight : Man
@@ -168,7 +168,7 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2658"; } } // U+2658 White Chess Knight (HTML &#9816;)
         public override string BlackCharCode { get { return "\u265E"; } } // U+265E Black Chess Knight (HTML &#9822;)
         public override ManType ManType { get { return ManType.Knight; } }
-        public override IEnumerable<RegularMove> Turns2(Board Board, int x, int y)
+        public override IEnumerable<RegularMove> Moves(Board Board, int x, int y)
         {
             for (int i = 0; i < 8; ++i)
             {
@@ -188,7 +188,7 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2657"; } } // U+2657 White Chess Bishop (HTML &#9815;)
         public override string BlackCharCode { get { return "\u265D"; } } // U+265D Black Chess Bishop (HTML &#9821;)
         public override ManType ManType { get { return ManType.Bishop; } }
-        public override IEnumerable<RegularMove> Turns2(Board board, int x, int y) { return TurnsHelper2(board, x, y, dx, dy, ManType); }
+        public override IEnumerable<RegularMove> Moves(Board board, int x, int y) { return TurnsHelper2(board, x, y, dx, dy); }
     }
 
     public class King : Man
@@ -199,7 +199,7 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2654"; } } // U+2654 White Chess King (HTML &#9812;)
         public override string BlackCharCode { get { return "\u265A"; } } // U+265A Black Chess King (HTML &#9818;)
         public override ManType ManType { get { return ManType.King; } }
-        public override IEnumerable<RegularMove> Turns2(Board Board, int manX, int manY)
+        public override IEnumerable<RegularMove> Moves(Board Board, int manX, int manY)
         {
             if (allDx.Length != allDy.Length)
                 throw new ArgumentException("allDx.Length != allDy.Length");
@@ -209,47 +209,28 @@ namespace ChessModel
                 int y = manY + allDy[i];
                 if (Board.IsEmptyOrNotColor(Color, x, y))
                 {
-                    yield return new KingMove(manX, manY, x, y);
+                    yield return new RegularMove(manX, manY, x, y);
                 }
             }
             // Castling
-            if (!Board.IsCheck)
+            if (!Moved && !Board.IsCheck)
             {
-                if (Color == ManColor.White)
+                var rockA = Board.Cell(0, Y);
+                if (rockA != null && !rockA.Moved &&
+                    Board.IsEmpty(1, Y) &&
+                    Board.IsEmpty(2, Y) &&
+                    Board.IsEmpty(3, Y) &&
+                    (!Board.CheckmateRule || !Board.IsCheckAt(Color, 3, Y)))
                 {
-                    if (Board.IsTowerA1AvailableForCastling &&
-                        Board.IsEmpty(1, 0) &&
-                        Board.IsEmpty(2, 0) &&
-                        Board.IsEmpty(3, 0) &&
-                        !Board.IsCheckAt(Color, 3, 0))
-                    {
-                        yield return new Castling(0, 0);
-                    }
-                    if (Board.IsTowerH1AvailableForCastling &&
-                        Board.IsEmpty(5, 0) &&
-                        Board.IsEmpty(6, 0) &&
-                        !Board.IsCheckAt(Color, 5, 0))
-                    {
-                        yield return new Castling(7, 0);
-                    }
+                    yield return new Castling(0, Y);
                 }
-                else if (Color == ManColor.Black)
+                var rockH = Board.Cell(7, Y);
+                if (rockH != null && !rockH.Moved &&
+                    Board.IsEmpty(5, Y) &&
+                    Board.IsEmpty(6, Y) &&
+                    (!Board.CheckmateRule || !Board.IsCheckAt(Color, 5, Y)))
                 {
-                    if (Board.IsTowerA8AvailableForCastling &&
-                        Board.IsEmpty(1, 7) &&
-                        Board.IsEmpty(2, 7) &&
-                        Board.IsEmpty(3, 7) &&
-                        !Board.IsCheckAt(Color, 3, 7))
-                    {
-                        yield return new Castling(0, 7);
-                    }
-                    if (Board.IsTowerH8AvailableForCastling &&
-                        Board.IsEmpty(5, 7) &&
-                        Board.IsEmpty(6, 7) &&
-                        !Board.IsCheckAt(Color, 5, 7))
-                    {
-                        yield return new Castling(7, 7);
-                    }
+                    yield return new Castling(7, Y);
                 }
             }
         }
@@ -263,6 +244,6 @@ namespace ChessModel
         public override string WhiteCharCode { get { return "\u2655"; } } // U+2655 White Chess Queen (HTML &#9813;)
         public override string BlackCharCode { get { return "\u265B"; } } // U+265B Black Chess Queen (HTML &#9819;)
         public override ManType ManType { get { return ManType.Queen; } }
-        public override IEnumerable<RegularMove> Turns2(Board board, int x, int y) { return TurnsHelper2(board, x, y, allDx, allDy, ManType); }
+        public override IEnumerable<RegularMove> Moves(Board board, int x, int y) { return TurnsHelper2(board, x, y, allDx, allDy); }
     }
 }

@@ -4,13 +4,10 @@
 @foreach (var game in Model)
 {
     <div>
-        @if (game.Value.BlackPlayer == null)
+        @Html.ActionLink(game.Value.Name, "Index", "Game", new { id = game.Key }, null)
+        @if (game.Value.BlackPlayer == null && User.Identity.Name != game.Value.WhitePlayer)
         {
-            @Html.ActionLink("Join " + game.Value.WhitePlayer + "'s game", "Join", "Game", new { id = game.Key }, null)
-        }
-        else
-        {
-            @Html.ActionLink(game.Value.WhitePlayer + " vs " + game.Value.BlackPlayer, "Index", "Game", new { id = game.Key }, null)
+            @Html.ActionLink("Join", "Join", "Game", new { id = game.Key }, null)
         }
     </div>
 }
