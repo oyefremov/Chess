@@ -5,17 +5,20 @@
 @{
     var boardOrientation = User.Identity.Name == Model.WhitePlayer || User.Identity.Name != Model.BlackPlayer ? ManColor.White : ManColor.Black;
     bool frozen;
-    if (Model.BlackPlayer == null)
-    {
-        frozen = User.Identity.Name != Model.WhitePlayer;
-    }
-    else if (Model.CurrentTurnSide == ManColor.White)
+    if (Model.CurrentTurnSide == ManColor.White)
     {
         frozen = User.Identity.Name != Model.WhitePlayer;
     }
     else
     {
-        frozen = User.Identity.Name != Model.BlackPlayer;
+        if (Model.BlackPlayer == null)
+        {
+            frozen = User.Identity.Name != Model.WhitePlayer || Model.DarkChess;
+        }
+        else
+        {        
+            frozen = User.Identity.Name != Model.BlackPlayer;
+        }
     }
     bool showWhite = User.Identity.Name == Model.WhitePlayer;
     bool showBlack = User.Identity.Name == Model.BlackPlayer;
