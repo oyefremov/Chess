@@ -27,21 +27,10 @@
         <tr>
             <td valign="top">
                 @Html.Partial("Board", Model)
-
-                @if (Model.Board.IsCheck)
+                
+                @if (Model.Status != null)
                 {
-                    if (Model.AvailableMoves.Count == 0)
-                    {
-                        <div class="check">Checkmate</div>
-                    }
-                    else
-                    {
-                        <div class="check">Check</div>
-                    }
-                }
-                else if (Model.AvailableMoves.Count == 0)
-                {
-                    <div class="check">Stalemate</div>
+                    <div class="check">@Model.Status</div>
                 }
 
                 @{

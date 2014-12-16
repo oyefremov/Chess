@@ -42,13 +42,6 @@ namespace ChessModel
         {
             availableMoves.Clear();
 
-            if (WhiteWinner || BlackWinner)
-            {
-                Board.IsCheck = true;
-                Board.SetVisibility(true);
-                return;
-            }
-
             if (Board.CheckRule)
             {
                 Board.IsCheck = Board.TestForCheck(CurrentSide);
@@ -125,16 +118,6 @@ namespace ChessModel
             if (regularMove == null)
                 throw new ArgumentException("Invalid move " + move);
 
-            if (DarkChess)
-            {
-                Man man = Board.Cell(regularMove.X2, regularMove.Y2);
-                if (man != null && man.ManType == ManType.King)
-                {
-                    WhiteWinner = man.Color == ManColor.Black;
-                    BlackWinner = man.Color == ManColor.White;
-                }
-            }
-
             if (TimeControl && MovesCount > 0)
             {
                 if (MovesCount == 1)
@@ -153,17 +136,56 @@ namespace ChessModel
                         else
                             BlackWinner = true;
 
-                        Status = "time out";
+                        Status = "Time out";
+                        Done = true;
                         return;
                     }
                 }
                 LastMoveTime = DateTime.Now;
             }
 
+
+            if (DarkChess)
+            {
+                Man man = Board.Cell(regularMove.X2, regularMove.Y2);
+                if (man != null && man.ManType == ManType.King)
+                {
+                    WhiteWinner = man.Color == ManColor.Black;
+                    BlackWinner = man.Color == ManColor.White;
+                    Status = "King was taken";
+                    Done = true;
+                }
+            }
+
             regularMove.Do(Board);
             Board.LastMove = regularMove;
-            ChangeSide();
-            CalculateMoves();
+            if (!Done)
+            {
+                ChangeSide();
+                CalculateMoves();
+
+                if (AvailableMoves.Count == 0)
+                {
+                    if (Board.IsCheck)
+                    {
+                        Status = "Checkmate";
+                        if (CurrentSide == ManColor.Black)
+                            WhiteWinner = true;
+                        else
+                            BlackWinner = true;
+                    }
+                    else
+                    {
+                        Status = "Stalemate";
+                    }
+                    Done = true;
+                }
+            }
+            else
+            {
+                AvailableMoves.Clear();
+                Board.SetVisibility(true);
+            }
 
             regularMove.Check = Board.IsCheck && AvailableMoves.Count != 0;
             regularMove.Checkmate = Board.IsCheck && AvailableMoves.Count == 0;
@@ -299,5 +321,7 @@ namespace ChessModel
         }
 
         public string Status { get; set; }
+
+        public bool Done { get; set; }
     }
 }
