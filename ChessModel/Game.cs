@@ -49,7 +49,10 @@ namespace ChessModel
                 return;
             }
 
-            Board.IsCheck = Board.TestForCheck(CurrentSide);
+            if (Board.CheckRule)
+            {
+                Board.IsCheck = Board.TestForCheck(CurrentSide);
+            }
             Board.SetVisibility(!DarkChess);
             List<String> whiteMans = new List<String>();
             List<String> blackMans = new List<String>();
