@@ -79,11 +79,50 @@ namespace Chess.Controllers
             var game = GamesManager.Instance.GetGame(id);
             if (game == null)
                 return Content("Game with id " + id + " not available");
-            if (User.Identity.Name != game.WhitePlayer)
-                game.BlackPlayer = User.Identity.Name;
+            lock (game)
+            {
+                if (game.BlackPlayer != null)
+                    return Content("Game already filled");
+                if (User.Identity.Name != game.WhitePlayer && game.BlackPlayer == null)
+                    game.BlackPlayer = User.Identity.Name;
+            }
+            return RedirectToAction("", new { id = game.Id });            
+        }
+        
+        public ActionResult SetTimeControl(int id, string param)
+        {
+            if (!User.Identity.IsAuthenticated)
+                return Content("User must be authenticated");
+            var game = GamesManager.Instance.GetGame(id);
+            if (game == null)
+                return Content("Game with id " + id + " not available");
+            lock (game)
+            {
+                var res = param.Split(',');
+                int baseTime, moveTime;
+                if (res.Length != 2 || !int.TryParse(res[0], out baseTime) || !int.TryParse(res[1], out moveTime))
+                {
+                    return Content("Invalid param=" + param);
+                }
+                if (User.Identity.Name != game.WhitePlayer && User.Identity.Name != game.BlackPlayer)
+                {
+                    return Content("Can not change time control for game " + id);
+                }
+                if (baseTime == 0 && moveTime == 0)
+                {
+                    game.TimeControl = false;
+                }
+                else
+                {
+                    game.TimeControl = true;
+                    game.MoveTime = new TimeSpan(0, 0, moveTime);
+                    game.BaseTime = new TimeSpan(0, 0, baseTime);
+                    game.WhitePlayerTime = game.BaseTime;
+                    game.BlackPlayerTime = game.BaseTime;
+                }
+            }
             return RedirectToAction("", new { id = game.Id });
         }
-
         public ActionResult MakeMove(int id, string move)
         {
             var game = GamesManager.Instance.GetGame(id);

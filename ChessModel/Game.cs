@@ -15,7 +15,7 @@ namespace ChessModel
 
         public Game(bool darkChess, bool check, bool checkmate)
         {
-            UseTimer = false;
+            TimeControl = false;
             DarkChess = darkChess;
             Board.CheckRule = check;
             Board.CheckmateRule = checkmate;
@@ -36,6 +36,7 @@ namespace ChessModel
         public int MovesCount { get { return moves.Count == 0 ? 0 : moves.Count * 2 - (moves[moves.Count - 1].Item2 == null ? 1 : 0); } }
 
         private IDictionary<String, RegularMove> availableMoves = new Dictionary<String, RegularMove>();
+        private DateTime LastMoveTime;
         public IDictionary<String, RegularMove> AvailableMoves { get { return availableMoves; } }
         void CalculateMoves()
         {
@@ -116,7 +117,7 @@ namespace ChessModel
         }
 
         public void MakeMove(string move)
-        {
+        {            
             var regularMove = AvailableMoves[move];
             if (regularMove == null)
                 throw new ArgumentException("Invalid move " + move);
@@ -129,6 +130,31 @@ namespace ChessModel
                     WhiteWinner = man.Color == ManColor.Black;
                     BlackWinner = man.Color == ManColor.White;
                 }
+            }
+
+            if (TimeControl && MovesCount > 0)
+            {
+                if (MovesCount == 1)
+                {
+                    WhitePlayerTime = BaseTime;
+                    BlackPlayerTime = BaseTime;
+                }
+                else
+                {
+                    var time = DateTime.Now - LastMoveTime - MoveTime;
+                    ReduceCurrentPlayerTime(time);
+                    if (time > CurrentSideTime)
+                    {
+                        if (CurrentSide == ManColor.White)
+                            WhiteWinner = true;
+                        else
+                            BlackWinner = true;
+
+                        Status = "time out";
+                        return;
+                    }
+                }
+                LastMoveTime = DateTime.Now;
             }
 
             regularMove.Do(Board);
@@ -147,6 +173,25 @@ namespace ChessModel
             {
                 var last = moves.Count - 1;
                 moves[last] = Tuple.Create(moves[last].Item1, regularMove);
+            }
+        }
+
+        private void ReduceCurrentPlayerTime(TimeSpan time)
+        {
+            if (time > TimeSpan.Zero)
+            {
+                if (CurrentSide == ManColor.White)
+                {
+                    WhitePlayerTime -= time;
+                    if (WhitePlayerTime < TimeSpan.Zero)
+                        WhitePlayerTime = TimeSpan.Zero;
+                }
+                else
+                {
+                    BlackPlayerTime -= time;
+                    if (BlackPlayerTime < TimeSpan.Zero)
+                        BlackPlayerTime = TimeSpan.Zero;
+                }
             }
         }
 
@@ -226,10 +271,30 @@ namespace ChessModel
         bool WhiteWinner { get; set; }
         bool BlackWinner { get; set; }
 
-        public bool UseTimer { get; set; }
-        public int BaseTimer { get; set; }
-        public int TurnTimer { get; set; }
-        public int WhitePlayerTimer { get; set; }
-        public int BlackPlayerTimer { get; set; }
+        public bool TimeControl { get; set; }
+        public TimeSpan BaseTime { get; set; }
+        public TimeSpan MoveTime { get; set; }
+        public TimeSpan WhitePlayerTime { get; set; }
+        public TimeSpan BlackPlayerTime { get; set; }
+
+        public TimeSpan CurrentSideTime 
+        {
+            get
+            {
+                var time = DateTime.Now - LastMoveTime - MoveTime;
+                if (time < TimeSpan.Zero) time = TimeSpan.Zero;
+                return (CurrentSide == ManColor.White ? WhitePlayerTime : BlackPlayerTime) - time;
+            }
+        }
+        public TimeSpan CurrentMoveTime
+        {
+            get
+            {
+                var time = MoveTime - (DateTime.Now - LastMoveTime);
+                return time > TimeSpan.Zero ? time : TimeSpan.Zero;
+            }
+        }
+
+        public string Status { get; set; }
     }
 }

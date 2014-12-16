@@ -23,7 +23,7 @@
     bool showWhite = User.Identity.Name == Model.WhitePlayer;
     bool showBlack = User.Identity.Name == Model.BlackPlayer;
 }
-<table>
+<table id="board">
     <tr>
         <td class="border"></td>
         @for (var j = 0; j < 8; ++j)

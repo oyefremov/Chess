@@ -3,7 +3,25 @@
 
 <div id="gameHolder">
     
-    <h2>@Model.Name</h2>
+    <h2>@Model.Name 
+        @if (Model.TimeControl)
+        {
+            var active = Model.MovesCount > 1 && Model.AvailableMoves.Count > 0;
+            <table><tr>
+                <td width="200pt" id="@(active && Model.CurrentSide == ManColor.White ? "activeTimer" : "whiteTimer")">www</td>
+                <td width="200pt" id="@(active && Model.CurrentSide == ManColor.Black ? "activeTimer" : "blackTimer")">bbb</td>
+            </tr></table>
+            <script type="text/javascript">
+                var whiteTime = @Math.Truncate(Model.WhitePlayerTime.TotalSeconds);
+                var blackTime = @Math.Truncate(Model.BlackPlayerTime.TotalSeconds);
+                var currTime = @Math.Truncate(Model.CurrentSideTime.TotalSeconds);
+                var extraTime = @Math.Truncate(Model.CurrentMoveTime.TotalSeconds);
+                showTime("#whiteTimer", whiteTime);
+                showTime("#blackTimer", blackTime);
+                showCurTimer();
+            </script>
+        }
+    </h2>
     <br />
     <table>
         <tr>
@@ -88,4 +106,18 @@
             </td>
         </tr>
     </table>
+    @if (Model.MovesCount == 0)
+{
+    using (Html.BeginForm("SetTimeControl", "Game"))
+    {
+            <select name="param">
+                <option value="0,0">no time control</option>
+                <option value="300,5">5 m for game and 5 s for move</option>
+                <option value="120,10">2 m for game and 10 s for move</option>
+                <option value="600,2">10 m for game and 2 s for move</option>
+            </select>
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="submit" value="Set time control" />
+        }
+    }
 </div>

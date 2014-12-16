@@ -1,5 +1,11 @@
 ﻿@model ChessModel.Game
 
+<script type="text/javascript">
+    function makeDraggable() {}
+    function showTime(id, t) {}
+    function showCurTimer() {}
+</script>
+
 @using (Ajax.BeginForm("show", null,
     new AjaxOptions
     {
@@ -41,7 +47,7 @@
 
     function makeDraggable() {
         $('.movable').draggable({
-            containment: "table",
+            containment: "#board",
             revert: 'invalid'
         });
 
@@ -77,6 +83,40 @@
             $('#refreshForm').submit();
         }
     }
+
+    function lz(t) {
+        return (t < 10) ? "0" + t : t;
+    }
+
+    function showTime(id, t) {
+        var min = Math.floor(t / 60);
+        var sec = t - min * 60;
+        $(id).html(min + ":" + lz(sec));
+    }
+
+    function showCurTimer() {
+        var min = Math.floor(currTime / 60);
+        var sec = currTime - min * 60;
+        var html = min + ":" + lz(sec);
+        if (extraTime > 0)
+            html += '<span style="font-size:small">+' + extraTime + '</span>';
+        $("#activeTimer").html(html);
+    }
+    showTime("#whiteTimer", whiteTime);
+    showTime("#blackTimer", blackTime);
+    showCurTimer();
+
+    function myTimer() {
+        if (extraTime > 0) {
+            --extraTime;
+        }
+        else if (currTime > 0){
+            --currTime;
+        }
+        showCurTimer();
+    }
+    var timer = setInterval(function () { myTimer() }, 1000);
+
 
 </script>
 }
