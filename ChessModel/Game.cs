@@ -180,8 +180,17 @@ namespace ChessModel
                     }
                     Done = true;
                 }
+                else if (Board.IsCheck)
+                {
+                    Status = "Check";
+                }
+                else
+                {
+                    Status = null;
+                }
             }
-            else
+
+            if (Done)
             {
                 AvailableMoves.Clear();
                 Board.SetVisibility(true);
